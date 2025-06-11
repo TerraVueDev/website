@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="assets/img/terravue-nobg.png" type="image/x-icon" />
+    <title>Search - Terravue</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .impact-badge {
+        transition: all 0.2s ease;
+      }
+      .impact-badge:hover {
+        transform: scale(1.05);
+      }
+      .search-item {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .search-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      }
+      .loading-spinner {
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .modal {
+        transition: all 0.3s ease;
+      }
+      .modal-backdrop {
+        backdrop-filter: blur(8px);
+      }
+      .modal-content {
+        animation: modalSlideIn 0.3s ease;
+      }
+      @keyframes modalSlideIn {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      .progress-bar {
+        animation: progressFill 2s ease-in-out;
+      }
+      @keyframes progressFill {
+        from {
+          width: 0%;
+        }
+        to {
+          width: var(--progress-width);
+        }
+      }
+    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
+          <a href="index.html">
+            <div class="flex items-center">
+              <div
+                class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3"
+              >
+                <img src="assets/img/terravue.png" alt="Terravue logo" />
+              </div>
+              <span class="text-xl font-semibold text-gray-900">Terravue</span>
+            </div>
+          </a>
+
+          <nav class="hidden md:flex space-x-8">
+            <a
+              href="search.html"
+              class="text-gray-700 hover:text-green-600 font-medium"
+              >Search</a
+            >
+            <a href="#" class="text-gray-700 hover:text-green-600 font-medium"
+              >Contributor</a
+            >
+          </nav>
+        </div>
+      </div>
+    </header>
+
+    <main class="mt-8">
+      <div class="max-w-6xl mx-auto px-4">
+        <!-- Hero Section -->
+        <div class="text-center mb-12">
+          <h1 class="text-4xl font-bold text-gray-900 mb-4">
+            Track the Environmental Impact of Your Digital Life
+          </h1>
+          <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
+            Discover how much carbon your favorite apps, websites, and digital
+            services generate. Make informed choices for a greener digital
+            footprint.
+          </p>
+        </div>
+
+        <!-- Search Box -->
+        <div class="max-w-2xl mx-auto mb-8">
+          <div class="relative">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search for websites, apps, or services..."
+              class="w-full px-6 py-4 text-lg border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-lg"
+            />
+            <button
+              class="absolute right-2 top-2 bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+            >
+              <svg
+                class="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-12">
+          <div
+            class="loading-spinner inline-block w-8 h-8 border-4 border-green-200 border-t-green-500 rounded-full"
+          ></div>
+          <p class="mt-4 text-gray-600">Loading environmental data...</p>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="hidden">
+          <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">
+              Digital Services Environmental Impact
+            </h2>
+            <p class="text-gray-600" id="resultCount"></p>
+            <p class="text-sm text-gray-500 mt-1">
+              Click on any card to view detailed environmental impact data
+            </p>
+          </div>
+
+          <!-- Filter Buttons -->
+          <div class="flex flex-wrap gap-2 mb-6">
+            <button
+              onclick="filterByImpact('all')"
+              class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition-colors active"
+            >
+              All
+            </button>
+            <button
+              onclick="filterByImpact('high')"
+              class="filter-btn bg-red-100 text-red-800 px-4 py-2 rounded-full hover:bg-red-200 transition-colors"
+            >
+              High Impact
+            </button>
+            <button
+              onclick="filterByImpact('medium')"
+              class="filter-btn bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full hover:bg-yellow-200 transition-colors"
+            >
+              Medium Impact
+            </button>
+            <button
+              onclick="filterByImpact('low')"
+              class="filter-btn bg-green-100 text-green-800 px-4 py-2 rounded-full hover:bg-green-200 transition-colors"
+            >
+              Low Impact
+            </button>
+          </div>
+
+          <!-- Results Grid -->
+          <div
+            id="resultsGrid"
+            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            <!-- Results will be populated here -->
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden text-center py-12">
+          <div class="text-red-500 text-6xl mb-4">⚠️</div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            Failed to Load Data
+          </h3>
+          <p class="text-gray-600 mb-4">
+            Unable to fetch environmental impact data. Please try again later.
+          </p>
+          <button
+            onclick="loadData()"
+            class="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal fixed inset-0 z-50 hidden">
+      <div
+        class="modal-backdrop fixed inset-0 bg-black bg-opacity-50"
+        onclick="closeModal()"
+      ></div>
+      <div class="fixed inset-0 flex items-center justify-center p-4">
+        <div
+          class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+        >
+          <!-- Modal Header -->
+          <div
+            class="flex items-center justify-between p-6 border-b border-gray-200"
+          >
+            <div class="flex items-center space-x-4">
+              <div
+                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center"
+              >
+                <span class="text-2xl">🌐</span>
+              </div>
+              <div>
+                <h2
+                  id="modalTitle"
+                  class="text-2xl font-bold text-gray-900"
+                ></h2>
+                <p id="modalCategory" class="text-gray-500"></p>
+              </div>
+            </div>
+            <button
+              onclick="closeModal()"
+              class="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg
+                class="w-8 h-8"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Modal Content -->
+          <div class="p-6 space-y-6">
+            <!-- Impact Badge -->
+            <div class="flex justify-center">
+              <div id="modalImpactBadge" class="text-lg"></div>
+            </div>
+
+            <!-- Description -->
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                Environmental Impact Overview
+              </h3>
+              <p
+                id="modalDescription"
+                class="text-gray-700 leading-relaxed"
+              ></p>
+            </div>
+
+            <!-- Annual Estimates -->
+            <div id="modalEstimates" class="space-y-6">
+              <!-- Energy Consumption -->
+              <div class="bg-blue-50 rounded-xl p-6">
+                <h3
+                  class="text-lg font-semibold text-blue-900 mb-4 flex items-center"
+                >
+                  <span class="mr-2">⚡</span>
+                  Annual Energy Consumption
+                </h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center">
+                    <span class="font-medium text-blue-800">Energy Usage:</span>
+                    <span
+                      id="modalEnergyAmount"
+                      class="text-2xl font-bold text-blue-900"
+                    ></span>
+                  </div>
+                  <p
+                    id="modalEnergyComparison"
+                    class="text-blue-700 text-sm bg-white bg-opacity-50 rounded-lg p-3"
+                  ></p>
+                </div>
+              </div>
+
+              <!-- Carbon Emissions -->
+              <div class="bg-red-50 rounded-xl p-6">
+                <h3
+                  class="text-lg font-semibold text-red-900 mb-4 flex items-center"
+                >
+                  <span class="mr-2">🏭</span>
+                  Annual Carbon Emissions
+                </h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center">
+                    <span class="font-medium text-red-800">CO2 Emissions:</span>
+                    <span
+                      id="modalCO2Amount"
+                      class="text-2xl font-bold text-red-900"
+                    ></span>
+                  </div>
+                  <p
+                    id="modalCO2Comparison"
+                    class="text-red-700 text-sm bg-white bg-opacity-50 rounded-lg p-3"
+                  ></p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Source Information -->
+            <div class="bg-gray-50 rounded-xl p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-3">
+                Data Source
+              </h3>
+              <div class="flex items-center space-x-2">
+                <span class="text-gray-600">📊</span>
+                <a
+                  id="modalSource"
+                  href="#"
+                  target="_blank"
+                  class="text-blue-600 hover:text-blue-800 underline text-sm"
+                ></a>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-center space-x-4 pt-4">
+              <button
+                onclick="visitWebsite()"
+                id="visitWebsiteBtn"
+                class="bg-green-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition-colors font-medium"
+              >
+                Visit Website
+              </button>
+              <button
+                onclick="closeModal()"
+                class="bg-gray-200 text-gray-800 px-6 py-3 rounded-full hover:bg-gray-300 transition-colors font-medium"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 py-12 mt-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row justify-between items-center">
+          <div class="flex items-center mb-4 md:mb-0">
+            <div
+              class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3"
+            >
+              <img
+                class="rounded-lg"
+                src="assets/img/terravue.png"
+                alt="Terravue logo"
+              />
+            </div>
+            <span class="text-xl font-semibold text-white">Terravue</span>
+          </div>
+          <div class="text-sm">
+            Building a sustainable future through digital education.
+          </div>
+          <div class="flex space-x-6 mt-4 md:mt-0">
+            <a href="#" class="hover:text-white transition-colors">Support</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
