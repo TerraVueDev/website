@@ -184,12 +184,11 @@ function createResultCard(result) {
   card.innerHTML = `
           <div class="flex items-center space-x-4 mb-4">
             <div class="flex-1">
-              <h3 class="text-xl font-semibold text-gray-900 mb-1">${
-                result.website
-              }</h3>
+              <h3 class="text-xl font-semibold text-gray-900 mb-1">${result.website
+    }</h3>
               <p class="text-gray-600 text-sm">${formatCategoryName(
-                result.category
-              )}</p>
+      result.category
+    )}</p>
             </div>
           </div>
           
@@ -197,9 +196,8 @@ function createResultCard(result) {
             ${getImpactBadge(result.impact)}
           </div>
           
-          <p class="text-gray-700 text-sm mb-4 line-clamp-3">${
-            result.description
-          }</p>
+          <p class="text-gray-700 text-sm mb-4 line-clamp-3">${result.description
+    }</p>
           
        <div class="mt-auto flex justify-between items-center pt-4 border-t border-gray-100">
     <span class="text-sm text-gray-500">Click for details</span>

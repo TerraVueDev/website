@@ -83,23 +83,21 @@ function displayResults() {
     .map(
       (item, index) => `
           <div class="search-item bg-white rounded-lg shadow-md p-6 border border-gray-200" onclick="openModal(${allData.indexOf(
-            item
-          )})">
+        item
+      )})">
             <div class="flex items-start justify-between mb-4">
               <div class="flex-1">
-                <h3 class="text-lg font-semibold text-gray-900 mb-1">${
-                  item.website
-                }</h3>
+                <h3 class="text-lg font-semibold text-gray-900 mb-1">${item.website
+        }</h3>
                 <p class="text-sm text-gray-500 mb-2">${formatCategoryName(
-                  item.categoryKey
-                )}</p>
+          item.categoryKey
+        )}</p>
               </div>
               ${getImpactBadge(item.category.impact)}
             </div>
             
-            <p class="text-gray-600 text-sm mb-4">${
-              item.category.description
-            }</p>
+            <p class="text-gray-600 text-sm mb-4">${item.category.description
+        }</p>
             
             <div class="flex items-center justify-between">
               <span class="text-xs text-gray-500">Click for detailed impact data</span>

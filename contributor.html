@@ -1,231 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    />
-    <link rel="icon" href="assets/img/terravue-nobg.png" type="image/x-icon" />
-    <title>Terravue - Track Your Digital Environmental Impact</title>
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-      body {
-        font-family: "Inter", sans-serif;
-      }
-    </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="assets/css/output.css" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <link rel="icon" href="assets/img/terravue-nobg.png" type="image/x-icon" />
+  <title>Terravue - Track Your Digital Environmental Impact</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-  <body class="bg-white">
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- Top bar with logo and hamburger -->
-        <div class="flex justify-between items-center py-4">
-          <a href="index.html">
-            <div class="flex items-center">
-              <div
-                class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3"
-              >
-                <img src="assets/img/terravue.png" alt="Terravue logo" />
-              </div>
-              <span class="text-xl font-semibold text-gray-900">Terravue</span>
+    body {
+      font-family: "Inter", sans-serif;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/output.css" />
+</head>
+
+<body class="bg-white">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <!-- Top bar with logo and hamburger -->
+      <div class="flex justify-between items-center py-4">
+        <a href="index.html">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+              <img src="assets/img/terravue.png" alt="Terravue logo" />
             </div>
-          </a>
+            <span class="text-xl font-semibold text-gray-900">Terravue</span>
+          </div>
+        </a>
 
-          <!-- Hamburger Button -->
-          <button
-            id="menu-toggle"
-            class="md:hidden text-gray-800 text-2xl focus:outline-none"
-          >
-            <i class="fas fa-bars"></i>
-          </button>
+        <!-- Hamburger Button -->
+        <button id="menu-toggle" class="md:hidden text-gray-800 text-2xl focus:outline-none">
+          <i class="fas fa-bars"></i>
+        </button>
 
-          <!-- Desktop Menu -->
-          <nav class="hidden md:flex space-x-8">
-            <a
-              href="index.html"
-              class="text-gray-700 hover:text-green-600 font-medium mr-0"
-              >Home</a
-            >
-            <a
-              href="search.html"
-              class="text-gray-700 hover:text-green-600 font-medium"
-              >Search</a
-            >
-            <a
-              href="contributor.html"
-              class="text-green-600 border-b-2 border-green-600 font-medium"
-              >Contributor</a
-            >
-          </nav>
-        </div>
-
-        <!-- Mobile Accordion Menu (below top bar) -->
-        <div
-          id="mobile-menu"
-          class="md:hidden hidden flex-col space-y-2 mt-4 px-2 transition-all duration-300 ease-in-out"
-        >
-          <a
-            href="index.html"
-            class="block text-gray-700 hover:text-green-600 font-medium"
-            >Home</a
-          >
-          <a
-            href="search.html"
-            class="block text-gray-700 hover:text-green-600 font-medium"
-            >Search</a
-          >
-          <a href="contributor.html" class="block text-green-600 font-medium"
-            >Contributor</a
-          >
-        </div>
+        <!-- Desktop Menu -->
+        <nav class="hidden md:flex space-x-8">
+          <a href="index.html" class="text-gray-700 hover:text-green-600 font-medium mr-0">Home</a>
+          <a href="search.html" class="text-gray-700 hover:text-green-600 font-medium">Search</a>
+          <a href="contributor.html" class="text-green-600 border-b-2 border-green-600 font-medium">Contributor</a>
+        </nav>
       </div>
-    </header>
 
-    <section class="py-20 bg-gray-50">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h1 class="text-4xl font-bold text-gray-900 mb-4">
-            Meet Our Contributors
-          </h1>
-          <p class="text-xl text-gray-600">
-            The amazing people who make Terravue possible
+      <!-- Mobile Accordion Menu (below top bar) -->
+      <div id="mobile-menu"
+        class="md:hidden hidden flex-col space-y-2 mt-4 px-2 transition-all duration-300 ease-in-out">
+        <a href="index.html" class="block text-gray-700 hover:text-green-600 font-medium">Home</a>
+        <a href="search.html" class="block text-gray-700 hover:text-green-600 font-medium">Search</a>
+        <a href="contributor.html" class="block text-green-600 font-medium">Contributor</a>
+      </div>
+    </div>
+  </header>
+
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">
+          Meet Our Contributors
+        </h1>
+        <p class="text-xl text-gray-600">
+          The amazing people who make Terravue possible
+        </p>
+      </div>
+
+      <!-- 2x2 Grid Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+        <!-- Contributor 1 -->
+        <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+          <div class="flex justify-center mb-4">
+            <img src="https://avatars.githubusercontent.com/u/150785230?s=130&v=4" alt="Konstantius Kevin Logo"
+              class="w-24 h-24 rounded-full object-cover" />
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            Konstantius Kevin
+          </h3>
+          <p class="text-base text-green-600 mb-4">Extension</p>
+          <p class="text-gray-600 leading-relaxed text-sm">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsum
+            recusandae laborum delectus, soluta inventore quia asperiores
+            dolorum tempora quo, quas aliquam ratione omnis, eos atque
+            repellat. Unde maiores iste facilis?
           </p>
         </div>
 
-        <!-- 2x2 Grid Layout -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-          <!-- Contributor 1 -->
-          <div class="bg-white rounded-lg shadow-sm p-8 text-center">
-            <div class="flex justify-center mb-4">
-              <img
-                src="https://avatars.githubusercontent.com/u/150785230?s=130&v=4"
-                alt="Konstantius Kevin Logo"
-                class="w-24 h-24 rounded-full object-cover"
-              />
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
-              Konstantius Kevin
-            </h3>
-            <p class="text-base text-green-600 mb-4">Extension</p>
-            <p class="text-gray-600 leading-relaxed text-sm">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ipsum
-              recusandae laborum delectus, soluta inventore quia asperiores
-              dolorum tempora quo, quas aliquam ratione omnis, eos atque
-              repellat. Unde maiores iste facilis?
-            </p>
+        <!-- Contributor 2 -->
+        <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+          <div class="flex justify-center mb-4">
+            <img src="https://avatars.githubusercontent.com/u/129840724?s=130&v=4" alt="Antonius Sebastian Logo"
+              class="w-24 h-24 rounded-full object-cover" />
           </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            Antonius Sebastian
+          </h3>
+          <p class="text-base text-green-600 mb-4">Android App</p>
+          <p class="text-gray-600 leading-relaxed text-sm">
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit.
+            Consequuntur quae vero autem maxime, quia necessitatibus porro
+            iusto officia, nihil blanditiis alias corporis deserunt earum nemo
+            perspiciatis nostrum recusandae repudiandae esse!
+          </p>
+        </div>
 
-          <!-- Contributor 2 -->
-          <div class="bg-white rounded-lg shadow-sm p-8 text-center">
-            <div class="flex justify-center mb-4">
-              <img
-                src="https://avatars.githubusercontent.com/u/129840724?s=130&v=4"
-                alt="Antonius Sebastian Logo"
-                class="w-24 h-24 rounded-full object-cover"
-              />
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
-              Antonius Sebastian
-            </h3>
-            <p class="text-base text-green-600 mb-4">Android App</p>
-            <p class="text-gray-600 leading-relaxed text-sm">
-              Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-              Consequuntur quae vero autem maxime, quia necessitatibus porro
-              iusto officia, nihil blanditiis alias corporis deserunt earum nemo
-              perspiciatis nostrum recusandae repudiandae esse!
-            </p>
+        <!-- Contributor 3 -->
+        <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+          <div class="flex justify-center mb-4">
+            <img src="https://avatars.githubusercontent.com/u/177084799?s=130&v=4" alt="Charles Stevano Logo"
+              class="w-24 h-24 rounded-full object-cover" />
           </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            Charles Stevano
+          </h3>
+          <p class="text-base text-green-600 mb-4">Website</p>
+          <p class="text-gray-600 leading-relaxed text-sm">
+            I am an undergraduate student passionate about web development and
+            Linux systems.
+          </p>
+        </div>
 
-          <!-- Contributor 3 -->
-          <div class="bg-white rounded-lg shadow-sm p-8 text-center">
-            <div class="flex justify-center mb-4">
-              <img
-                src="https://avatars.githubusercontent.com/u/177084799?s=130&v=4"
-                alt="Charles Stevano Logo"
-                class="w-24 h-24 rounded-full object-cover"
-              />
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
-              Charles Stevano
-            </h3>
-            <p class="text-base text-green-600 mb-4">Website</p>
-            <p class="text-gray-600 leading-relaxed text-sm">
-              I am an undergraduate student passionate about web development and
-              Linux systems.
-            </p>
+        <!-- Empty slot for future contributor -->
+        <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+          <div class="flex justify-center mb-4">
+            <img src="https://avatars.githubusercontent.com/u/79074831?s=130&v=4" alt="Harry Rosianto Logo"
+              class="w-24 h-24 rounded-full object-cover" />
           </div>
-
-          <!-- Empty slot for future contributor -->
-          <div class="bg-white rounded-lg shadow-sm p-8 text-center">
-            <div class="flex justify-center mb-4">
-              <img
-                src="https://avatars.githubusercontent.com/u/79074831?s=130&v=4"
-                alt="Harry Rosianto Logo"
-                class="w-24 h-24 rounded-full object-cover"
-              />
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
-              Harry Rosianto
-            </h3>
-            <p class="text-base text-green-600 mb-4">Faculty</p>
-            <p class="text-gray-600 leading-relaxed text-sm">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem
-              esse exercitationem sed nemo quam. Atque consequatur, velit
-              obcaecati fuga tempore facilis, eligendi eum recusandae nostrum ea
-              debitis libero officia voluptate?
-            </p>
-          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">
+            Harry Rosianto
+          </h3>
+          <p class="text-base text-green-600 mb-4">Faculty</p>
+          <p class="text-gray-600 leading-relaxed text-sm">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolorem
+            esse exercitationem sed nemo quam. Atque consequatur, velit
+            obcaecati fuga tempore facilis, eligendi eum recusandae nostrum ea
+            debitis libero officia voluptate?
+          </p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 py-12">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div
-          class="flex flex-col gap-6 md:flex-row md:justify-between md:items-center"
-        >
-          <!-- Logo -->
-          <div class="flex justify-center">
-            <div
-              class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3"
-            >
-              <img
-                class="rounded-lg"
-                src="assets/img/terravue.png"
-                alt="Terravue logo"
-              />
-            </div>
-            <span class="text-xl font-semibold text-white">Terravue</span>
+  <!-- Footer -->
+  <footer class="bg-gray-900 text-gray-300 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-6 md:flex-row md:justify-between md:items-center">
+        <!-- Logo -->
+        <div class="flex justify-center">
+          <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+            <img class="rounded-lg" src="assets/img/terravue.png" alt="Terravue logo" />
           </div>
+          <span class="text-xl font-semibold text-white">Terravue</span>
+        </div>
 
-          <!-- Tagline -->
-          <div class="text-sm text-center md:text-left">
-            Building a sustainable future through digital education.
-          </div>
+        <!-- Tagline -->
+        <div class="text-sm text-center md:text-left">
+          Building a sustainable future through digital education.
+        </div>
 
-          <!-- Links -->
-          <div class="flex justify-center md:justify-end space-x-6">
-            <a href="#" class="hover:text-white transition-colors mr-0"
-              >Support</a
-            >
-          </div>
+        <!-- Links -->
+        <div class="flex justify-center md:justify-end space-x-6">
+          <a href="#" class="hover:text-white transition-colors mr-0">Support</a>
         </div>
       </div>
-    </footer>
-    <script>
-      const toggleBtn = document.getElementById("menu-toggle");
-      const mobileMenu = document.getElementById("mobile-menu");
+    </div>
+  </footer>
+  <script>
+    const toggleBtn = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
 
-      toggleBtn.addEventListener("click", () => {
-        mobileMenu.classList.toggle("hidden");
-      });
-    </script>
-  </body>
+    toggleBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  </script>
+</body>
+
 </html>
