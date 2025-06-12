@@ -1,315 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    />
-    <link rel="icon" href="assets/img/terravue-nobg.png" type="image/x-icon" />
-    <title>Terravue - Track Your Digital Environmental Impact</title>
-    <style>
-      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
-      body {
-        font-family: "Inter", sans-serif;
-      }
-    </style>
-    <link rel="stylesheet" href="assets/css/output.css" />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
-  <body class="bg-white">
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center py-4">
-          <a href="index.html">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
+  <link rel="icon" href="assets/img/terravue-nobg.png" type="image/x-icon" />
+  <title>Terravue - Track Your Digital Environmental Impact</title>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+    body {
+      font-family: "Inter", sans-serif;
+    }
+  </style>
+  <link rel="stylesheet" href="assets/css/output.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-white">
+  <!-- Header -->
+  <header class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <a href="index.html">
+          <div class="flex items-center">
+            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+              <img src="assets/img/terravue.png" alt="Terravue logo" />
+            </div>
+            <span class="text-xl font-semibold text-gray-900">Terravue</span>
+          </div>
+        </a>
+
+        <!-- Hamburger Button -->
+        <button id="menu-toggle" class="md:hidden text-gray-800 text-2xl focus:outline-none">
+          <i class="fas fa-bars"></i>
+        </button>
+
+        <nav class="hidden md:flex space-x-8">
+          <a href="index.html" class="text-green-600 border-b-2 border-green-600 font-medium mr-0">Home</a>
+          <a href="search.html" class="text-gray-700 hover:text-green-600 font-medium">Search</a>
+          <a href="contributor.html" class="text-gray-700 hover:text-green-600 font-medium">Contributor</a>
+        </nav>
+      </div>
+
+      <!-- Mobile Accordion Menu -->
+      <div id="mobile-menu" class="hidden md:hidden flex-col space-y-2 pb-4">
+        <a href="index.html" class="block text-green-600 font-medium">Home</a>
+        <a href="search.html" class="block text-gray-700 hover:text-green-600 font-medium">Search</a>
+        <a href="contributor.html" class="block text-gray-700 hover:text-green-600 font-medium">Contributor</a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="bg-gradient-to-b from-green-50 to-white py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <h1 class="text-5xl font-bold text-gray-900 leading-tight mb-6">
+            Track the Environmental Impact of Your Digital Life
+          </h1>
+          <p class="text-xl text-gray-600 mb-8">
+            Discover how much carbon your favorite apps, websites, and digital
+            services generate. Make informed choices for a greener digital
+            footprint.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 mb-8">
+            <button
+              class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center">
+              <span class="flex gap-2 items-center">
+                <svg class="fill-white" xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 512 512">
+                  <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                  <path
+                    d="M0 256C0 209.4 12.5 165.6 34.3 127.1L144.1 318.3C166 357.5 207.9 384 256 384C270.3 384 283.1 381.7 296.8 377.4L220.5 509.6C95.9 492.3 0 385.3 0 256zM365.1 321.6C377.4 302.4 384 279.1 384 256C384 217.8 367.2 183.5 340.7 160H493.4C505.4 189.6 512 222.1 512 256C512 397.4 397.4 511.1 256 512L365.1 321.6zM477.8 128H256C193.1 128 142.3 172.1 130.5 230.7L54.2 98.5C101 38.5 174 0 256 0C350.8 0 433.5 51.5 477.8 128V128zM168 256C168 207.4 207.4 168 256 168C304.6 168 344 207.4 344 256C344 304.6 304.6 344 256 344C207.4 344 168 304.6 168 256z" />
+                </svg>
+                Add to Chrome
+              </span>
+            </button>
+            <button
+              class="border-green-600 text-green-600 border-2 px-8 py-3 rounded-lg font-semibold hover:bg-green-600 hover:text-white transition-colors flex items-center justify-center group">
+              <span class="flex gap-2 items-center">
+                <svg class="fill-green-600 group-hover:fill-white" xmlns="http://www.w3.org/2000/svg" height="20"
+                  width="22.5" viewBox="0 0 576 512">
+                  <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                  <path
+                    d="M420.6 301.9a24 24 0 1 1 24-24 24 24 0 0 1 -24 24m-265.1 0a24 24 0 1 1 24-24 24 24 0 0 1 -24 24m273.7-144.5 47.9-83a10 10 0 1 0 -17.3-10h0l-48.5 84.1a301.3 301.3 0 0 0 -246.6 0L116.2 64.5a10 10 0 1 0 -17.3 10h0l47.9 83C64.5 202.2 8.2 285.6 0 384H576c-8.2-98.5-64.5-181.8-146.9-226.6" />
+                </svg>
+                Get Mobile App
+              </span>
+            </button>
+          </div>
+          <div class="flex items-center space-x-6 text-sm text-gray-600">
             <div class="flex items-center">
-              <div
-                class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3"
-              >
-                <img src="assets/img/terravue.png" alt="Terravue logo" />
-              </div>
-              <span class="text-xl font-semibold text-gray-900">Terravue</span>
+              <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+              Free to Use
             </div>
-          </a>
-
-          <nav class="hidden md:flex space-x-8">
-            <a
-              href="index.html"
-              class="text-green-600 border-b-2 border-green-600 font-medium mr-3"
-              >Home</a
-            >
-            <a
-              href="search.html"
-              class="text-gray-700 hover:text-green-600 font-medium"
-              >Search</a
-            >
-            <a
-              href="contributor.html"
-              class="text-gray-700 hover:text-green-600 font-medium"
-              >Contributor</a
-            >
-          </nav>
-        </div>
-      </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="bg-gradient-to-b from-green-50 to-white py-20">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 class="text-5xl font-bold text-gray-900 leading-tight mb-6">
-              Track the Environmental Impact of Your Digital Life
-            </h1>
-            <p class="text-xl text-gray-600 mb-8">
-              Discover how much carbon your favorite apps, websites, and digital
-              services generate. Make informed choices for a greener digital
-              footprint.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4 mb-8">
-              <button
-                class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center"
-              >
-                <span class="flex gap-2 items-center">
-                  <svg
-                    class="fill-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="20"
-                    width="20"
-                    viewBox="0 0 512 512"
-                  >
-                    <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                    <path
-                      d="M0 256C0 209.4 12.5 165.6 34.3 127.1L144.1 318.3C166 357.5 207.9 384 256 384C270.3 384 283.1 381.7 296.8 377.4L220.5 509.6C95.9 492.3 0 385.3 0 256zM365.1 321.6C377.4 302.4 384 279.1 384 256C384 217.8 367.2 183.5 340.7 160H493.4C505.4 189.6 512 222.1 512 256C512 397.4 397.4 511.1 256 512L365.1 321.6zM477.8 128H256C193.1 128 142.3 172.1 130.5 230.7L54.2 98.5C101 38.5 174 0 256 0C350.8 0 433.5 51.5 477.8 128V128zM168 256C168 207.4 207.4 168 256 168C304.6 168 344 207.4 344 256C344 304.6 304.6 344 256 344C207.4 344 168 304.6 168 256z"
-                    />
-                  </svg>
-                  Add to Chrome
-                </span>
-              </button>
-              <button
-                class="border-green-600 text-green-600 border-2 px-8 py-3 rounded-lg font-semibold hover:bg-green-600 hover:text-white transition-colors flex items-center justify-center group"
-              >
-                <span class="flex gap-2 items-center">
-                  <svg
-                    class="fill-green-600 group-hover:fill-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    height="20"
-                    width="22.5"
-                    viewBox="0 0 576 512"
-                  >
-                    <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
-                    <path
-                      d="M420.6 301.9a24 24 0 1 1 24-24 24 24 0 0 1 -24 24m-265.1 0a24 24 0 1 1 24-24 24 24 0 0 1 -24 24m273.7-144.5 47.9-83a10 10 0 1 0 -17.3-10h0l-48.5 84.1a301.3 301.3 0 0 0 -246.6 0L116.2 64.5a10 10 0 1 0 -17.3 10h0l47.9 83C64.5 202.2 8.2 285.6 0 384H576c-8.2-98.5-64.5-181.8-146.9-226.6"
-                    />
-                  </svg>
-                  Get Mobile App
-                </span>
-              </button>
-            </div>
-            <div class="flex items-center space-x-6 text-sm text-gray-600">
-              <div class="flex items-center">
-                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                Free to Use
-              </div>
-              <div class="flex items-center">
-                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-                Privacy Focused
-              </div>
+            <div class="flex items-center">
+              <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+              Privacy Focused
             </div>
           </div>
-          <div
-            class="relative border h-[500px] rounded-2xl flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50"
-          >
-            <img
-              src="assets/img/terravue-nobg.png"
-              alt="Terravue - Environmental Impact Tracker"
-              class="w-64 h-64 object-contain"
-            />
-          </div>
+        </div>
+        <div
+        id="logo-hide-mobile"
+          class="relative h-[500px] rounded-2xl flex items-center justify-center bg-gradient-to-br from-green-50 to-blue-50">
+          <img src="assets/img/terravue-nobg.png" alt="Terravue - Environmental Impact Tracker"
+            class="w-64 h-64 object-contain" />
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Features Section -->
-    <section class="py-20 bg-white">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-gray-900 mb-4">
-            Powerful Features for Environmental Awareness
-          </h2>
-          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Get detailed insights into the carbon footprint of your digital
-            activities with our comprehensive tracking tools.
+  <!-- Features Section -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold text-gray-900 mb-4">
+          Powerful Features for Environmental Awareness
+        </h2>
+        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+          Get detailed insights into the carbon footprint of your digital
+          activities with our comprehensive tracking tools.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl"><i class="fa-solid fa-earth-americas"></i></span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Website Carbon Tracking
+          </h3>
+          <p class="text-gray-600">
+            Real-time carbon footprint analysis of websites you visit,
+            including data consumption and server emissions.
           </p>
         </div>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-2xl"
-                ><i class="fa-solid fa-earth-americas"></i
-              ></span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Website Carbon Tracking
-            </h3>
-            <p class="text-gray-600">
-              Real-time carbon footprint analysis of websites you visit,
-              including data consumption and server emissions.
-            </p>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl"><i class="fa-solid fa-binoculars"></i></i></span>
           </div>
-
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-2xl"><i class="fa-solid fa-binoculars"></i></i></span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              App Impact Monitor
-            </h3>
-            <p class="text-gray-600">
-              Track the environmental impact of your mobile apps, including
-              battery usage, data consumption, and device usage.
-            </p>
-          </div>
-
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-2xl"
-                ><i class="fa-solid fa-chart-line"></i
-              ></span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Detailed Analytics
-            </h3>
-            <p class="text-gray-600">
-              Comprehensive reports showing your digital carbon footprint trends
-              over time with actionable insights.
-            </p>
-          </div>
-
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-2xl"
-                ><i class="fa-solid fa-eye-slash"></i
-              ></span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Privacy First
-            </h3>
-            <p class="text-gray-600">
-              All tracking is performed locally on your device. No personal data
-              is collected or shared with third parties.
-            </p>
-          </div>
-
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-2xl"><i class="fa-solid fa-bolt"></i></span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Smart Recommendations
-            </h3>
-            <p class="text-gray-600">
-              Get personalized suggestions for reducing your digital carbon
-              footprint with alternative app and service options.
-            </p>
-          </div>
-
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-2xl"><i class="fa-solid fa-seedling"></i></span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Carbon Offsetting
-            </h3>
-            <p class="text-gray-600">
-              Connect with verified carbon offset programs to neutralize your
-              digital environmental impact.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- How It Works Section -->
-    <section class="py-20 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
-          <p class="text-xl text-gray-600">
-            Simple setup, powerful insights. Start tracking your digital
-            environmental impact in minutes.
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            App Impact Monitor
+          </h3>
+          <p class="text-gray-600">
+            Track the environmental impact of your mobile apps, including
+            battery usage, data consumption, and device usage.
           </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8">
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-white text-2xl font-bold">1</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Install Extension/App
-            </h3>
-            <p class="text-gray-600">
-              Download our browser extension or mobile app from the official
-              stores. Quick and easy installation.
-            </p>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl"><i class="fa-solid fa-chart-line"></i></span>
           </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Detailed Analytics
+          </h3>
+          <p class="text-gray-600">
+            Comprehensive reports showing your digital carbon footprint trends
+            over time with actionable insights.
+          </p>
+        </div>
 
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-white text-2xl font-bold">2</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Automatic Tracking
-            </h3>
-            <p class="text-gray-600">
-              EcoTracker automatically monitors your digital activities and
-              calculates their environmental impact.
-            </p>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl"><i class="fa-solid fa-eye-slash"></i></span>
           </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Privacy First
+          </h3>
+          <p class="text-gray-600">
+            All tracking is performed locally on your device. No personal data
+            is collected or shared with third parties.
+          </p>
+        </div>
 
-          <div class="text-center">
-            <div
-              class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
-            >
-              <span class="text-white text-2xl font-bold">3</span>
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-4">
-              Take Action
-            </h3>
-            <p class="text-gray-600">
-              Get insights and recommendations to reduce your carbon footprint
-              and make greener digital choices.
-            </p>
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl"><i class="fa-solid fa-bolt"></i></span>
           </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Smart Recommendations
+          </h3>
+          <p class="text-gray-600">
+            Get personalized suggestions for reducing your digital carbon
+            footprint with alternative app and service options.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-2xl"><i class="fa-solid fa-seedling"></i></span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Carbon Offsetting
+          </h3>
+          <p class="text-gray-600">
+            Connect with verified carbon offset programs to neutralize your
+            digital environmental impact.
+          </p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Footer -->
+  <!-- How It Works Section -->
+  <section class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+        <p class="text-xl text-gray-600">
+          Simple setup, powerful insights. Start tracking your digital
+          environmental impact in minutes.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-white text-2xl font-bold">1</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Install Extension/App
+          </h3>
+          <p class="text-gray-600">
+            Download our browser extension or mobile app from the official
+            stores. Quick and easy installation.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-white text-2xl font-bold">2</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Automatic Tracking
+          </h3>
+          <p class="text-gray-600">
+            EcoTracker automatically monitors your digital activities and
+            calculates their environmental impact.
+          </p>
+        </div>
+
+        <div class="text-center">
+          <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="text-white text-2xl font-bold">3</span>
+          </div>
+          <h3 class="text-xl font-semibold text-gray-900 mb-4">
+            Take Action
+          </h3>
+          <p class="text-gray-600">
+            Get insights and recommendations to reduce your carbon footprint
+            and make greener digital choices.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
     <footer class="bg-gray-900 text-gray-300 py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-          <div class="flex items-center mb-4 md:mb-0">
+        <div
+          class="flex flex-col gap-6 md:flex-row md:justify-between md:items-center"
+        >
+          <!-- Logo -->
+          <div class="flex justify-center">
             <div
               class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3"
             >
@@ -321,14 +281,29 @@
             </div>
             <span class="text-xl font-semibold text-white">Terravue</span>
           </div>
-          <div class="text-sm">
+
+          <!-- Tagline -->
+          <div class="text-sm text-center md:text-left">
             Building a sustainable future through digital education.
           </div>
-          <div class="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" class="hover:text-white transition-colors">Support</a>
+
+          <!-- Links -->
+          <div class="flex justify-center md:justify-end space-x-6">
+            <a href="#" class="hover:text-white transition-colors mr-0"
+              >Support</a
+            >
           </div>
         </div>
       </div>
     </footer>
-  </body>
+  <script>
+    const toggleBtn = document.getElementById("menu-toggle");
+    const mobileMenu = document.getElementById("mobile-menu");
+
+    toggleBtn.addEventListener("click", () => {
+      mobileMenu.classList.toggle("hidden");
+    });
+  </script>
+</body>
+
 </html>
