@@ -10,19 +10,32 @@
       body {
         font-family: "Inter", sans-serif;
       }
+      .search-container {
+        position: relative;
+        max-width: 600px;
+        margin: 0 auto;
+      }
+      .search-input {
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
+      .search-input:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+      }
+      .result-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+      .result-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.15);
+      }
       .impact-badge {
         transition: all 0.2s ease;
       }
       .impact-badge:hover {
         transform: scale(1.05);
-      }
-      .search-item {
-        transition: all 0.3s ease;
-        cursor: pointer;
-      }
-      .search-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
       .loading-spinner {
         animation: spin 1s linear infinite;
@@ -35,35 +48,44 @@
           transform: rotate(360deg);
         }
       }
-      .modal {
-        transition: all 0.3s ease;
+      .fade-in {
+        animation: fadeIn 0.5s ease-in;
       }
-      .modal-backdrop {
-        backdrop-filter: blur(8px);
-      }
-      .modal-content {
-        animation: modalSlideIn 0.3s ease;
-      }
-      @keyframes modalSlideIn {
+      @keyframes fadeIn {
         from {
           opacity: 0;
-          transform: scale(0.9) translateY(-20px);
+          transform: translateY(20px);
         }
         to {
           opacity: 1;
-          transform: scale(1) translateY(0);
+          transform: translateY(0);
         }
       }
-      .progress-bar {
-        animation: progressFill 2s ease-in-out;
+      .search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-top: none;
+        border-radius: 0 0 12px 12px;
+        max-height: 200px;
+        overflow-y: auto;
+        z-index: 10;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
       }
-      @keyframes progressFill {
-        from {
-          width: 0%;
-        }
-        to {
-          width: var(--progress-width);
-        }
+      .suggestion-item {
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+        transition: background-color 0.2s ease;
+      }
+      .suggestion-item:hover {
+        background-color: #f9fafb;
+      }
+      .suggestion-item:last-child {
+        border-bottom: none;
       }
     </style>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -92,7 +114,7 @@
             >
             <a
               href="search.html"
-              class="text-gray-700 hover:text-green-600 font-medium"
+              class="text-green-600 border-b-2 border-green-600 font-medium"
               >Search</a
             >
             <a href="#" class="text-gray-700 hover:text-green-600 font-medium"
@@ -103,34 +125,32 @@
       </div>
     </header>
 
-    <main class="mt-8">
-      <div class="max-w-6xl mx-auto px-4">
-        <!-- Hero Section -->
-        <div class="text-center mb-12">
-          <h1 class="text-4xl font-bold text-gray-900 mb-4">
-            Track the Environmental Impact of Your Digital Life
-          </h1>
-          <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-            Discover how much carbon your favorite apps, websites, and digital
-            services generate. Make informed choices for a greener digital
-            footprint.
-          </p>
-        </div>
+    <!-- Hero Section -->
+    <section class="py-16 bg-gradient-to-br from-green-50 to-blue-50">
+      <div class="max-w-4xl mx-auto px-4 text-center">
+        <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+          Search Environmental Impact
+        </h1>
+        <p class="text-xl text-gray-600 mb-8">
+          Discover the carbon footprint of your favorite websites and services
+        </p>
 
-        <!-- Search Box -->
-        <div class="max-w-2xl mx-auto mb-8">
+        <!-- Search Container -->
+        <div class="search-container">
           <div class="relative">
             <input
               type="text"
               id="searchInput"
-              placeholder="Search for websites, apps, or services..."
-              class="w-full px-6 py-4 text-lg border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-lg"
+              placeholder="Enter website or service name..."
+              class="search-input w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-full focus:outline-none focus:border-green-500 bg-white"
+              autocomplete="off"
             />
             <button
-              class="absolute right-2 top-2 bg-green-500 text-white p-2 rounded-full hover:bg-green-600 transition-colors"
+              id="searchButton"
+              class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition-colors"
             >
               <svg
-                class="w-6 h-6"
+                class="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -143,239 +163,113 @@
                 ></path>
               </svg>
             </button>
+
+            <!-- Search Suggestions -->
+            <div id="searchSuggestions" class="search-suggestions hidden"></div>
           </div>
         </div>
+      </div>
+    </section>
 
+    <!-- Main Content -->
+    <main class="py-12">
+      <div class="max-w-6xl mx-auto px-4">
         <!-- Loading State -->
-        <div id="loadingState" class="text-center py-12">
+        <div id="loadingState" class="hidden text-center py-12">
           <div
             class="loading-spinner inline-block w-8 h-8 border-4 border-green-200 border-t-green-500 rounded-full"
           ></div>
-          <p class="mt-4 text-gray-600">Loading environmental data...</p>
+          <p class="mt-4 text-gray-600">Searching environmental data...</p>
+        </div>
+
+        <!-- No Results State -->
+        <div id="noResults" class="hidden text-center py-12">
+          <div class="text-gray-400 text-6xl mb-4">🔍</div>
+          <h3 class="text-2xl font-semibold text-gray-900 mb-2">
+            No Results Found
+          </h3>
+          <p class="text-gray-600 mb-6">
+            We couldn't find any environmental data for your search. Try a
+            different term or check our popular searches below.
+          </p>
         </div>
 
         <!-- Results Container -->
         <div id="resultsContainer" class="hidden">
-          <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-900 mb-2">
-              Digital Services Environmental Impact
+          <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-900">
+              Search Results
+              <span id="resultCount" class="text-green-600"></span>
             </h2>
-            <p class="text-gray-600" id="resultCount"></p>
-            <p class="text-sm text-gray-500 mt-1">
-              Click on any card to view detailed environmental impact data
-            </p>
+            <div class="flex items-center space-x-4">
+              <label class="text-gray-700 font-medium">Sort by:</label>
+              <select
+                id="sortSelect"
+                class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-green-500"
+              >
+                <option value="relevance">Relevance</option>
+                <option value="impact-high">Impact (High to Low)</option>
+                <option value="impact-low">Impact (Low to High)</option>
+                <option value="alphabetical">Alphabetical</option>
+              </select>
+            </div>
           </div>
 
-          <!-- Filter Buttons -->
-          <div class="flex flex-wrap gap-2 mb-6">
-            <button
-              onclick="filterByImpact('all')"
-              class="filter-btn bg-gray-200 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300 transition-colors active"
-            >
-              All
-            </button>
-            <button
-              onclick="filterByImpact('high')"
-              class="filter-btn bg-red-100 text-red-800 px-4 py-2 rounded-full hover:bg-red-200 transition-colors"
-            >
-              High Impact
-            </button>
-            <button
-              onclick="filterByImpact('medium')"
-              class="filter-btn bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full hover:bg-yellow-200 transition-colors"
-            >
-              Medium Impact
-            </button>
-            <button
-              onclick="filterByImpact('low')"
-              class="filter-btn bg-green-100 text-green-800 px-4 py-2 rounded-full hover:bg-green-200 transition-colors"
-            >
-              Low Impact
-            </button>
-          </div>
-
-          <!-- Results Grid -->
           <div
             id="resultsGrid"
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            <!-- Results will be populated here -->
-          </div>
+          ></div>
         </div>
 
-        <!-- Error State -->
-        <div id="errorState" class="hidden text-center py-12">
-          <div class="text-red-500 text-6xl mb-4">⚠️</div>
-          <h3 class="text-xl font-semibold text-gray-900 mb-2">
-            Failed to Load Data
+        <!-- Popular Searches -->
+        <div id="popularSearches" class="mt-16">
+          <h3 class="text-2xl font-bold text-gray-900 mb-8 text-center">
+            Popular Searches
           </h3>
-          <p class="text-gray-600 mb-4">
-            Unable to fetch environmental impact data. Please try again later.
-          </p>
-          <button
-            onclick="loadData()"
-            class="bg-green-500 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-colors"
-          >
-            Retry
-          </button>
+          <div class="flex flex-wrap justify-center gap-3">
+            <button
+              class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-500 hover:text-green-600 transition-colors font-medium"
+              data-search="google.com"
+            >
+              Google
+            </button>
+            <button
+              class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-500 hover:text-green-600 transition-colors font-medium"
+              data-search="youtube.com"
+            >
+              YouTube
+            </button>
+            <button
+              class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-500 hover:text-green-600 transition-colors font-medium"
+              data-search="facebook.com"
+            >
+              Facebook
+            </button>
+            <button
+              class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-500 hover:text-green-600 transition-colors font-medium"
+              data-search="netflix.com"
+            >
+              Netflix
+            </button>
+            <button
+              class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-500 hover:text-green-600 transition-colors font-medium"
+              data-search="amazon.com"
+            >
+              Amazon
+            </button>
+            <button
+              class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-500 hover:text-green-600 transition-colors font-medium"
+              data-search="twitter.com"
+            >
+              Twitter
+            </button>
+          </div>
         </div>
       </div>
     </main>
 
-    <!-- Detail Modal -->
-    <div id="detailModal" class="modal fixed inset-0 z-50 hidden">
-      <div
-        class="modal-backdrop fixed inset-0 bg-black bg-opacity-50"
-        onclick="closeModal()"
-      ></div>
-      <div class="fixed inset-0 flex items-center justify-center p-4">
-        <div
-          class="modal-content bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
-        >
-          <!-- Modal Header -->
-          <div
-            class="flex items-center justify-between p-6 border-b border-gray-200"
-          >
-            <div class="flex items-center space-x-4">
-              <div
-                class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center"
-              >
-                <span class="text-2xl">🌐</span>
-              </div>
-              <div>
-                <h2
-                  id="modalTitle"
-                  class="text-2xl font-bold text-gray-900"
-                ></h2>
-                <p id="modalCategory" class="text-gray-500"></p>
-              </div>
-            </div>
-            <button
-              onclick="closeModal()"
-              class="text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <svg
-                class="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                ></path>
-              </svg>
-            </button>
-          </div>
-
-          <!-- Modal Content -->
-          <div class="p-6 space-y-6">
-            <!-- Impact Badge -->
-            <div class="flex justify-center">
-              <div id="modalImpactBadge" class="text-lg"></div>
-            </div>
-
-            <!-- Description -->
-            <div class="bg-gray-50 rounded-xl p-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">
-                Environmental Impact Overview
-              </h3>
-              <p
-                id="modalDescription"
-                class="text-gray-700 leading-relaxed"
-              ></p>
-            </div>
-
-            <!-- Annual Estimates -->
-            <div id="modalEstimates" class="space-y-6">
-              <!-- Energy Consumption -->
-              <div class="bg-blue-50 rounded-xl p-6">
-                <h3
-                  class="text-lg font-semibold text-blue-900 mb-4 flex items-center"
-                >
-                  <span class="mr-2">⚡</span>
-                  Annual Energy Consumption
-                </h3>
-                <div class="space-y-3">
-                  <div class="flex justify-between items-center">
-                    <span class="font-medium text-blue-800">Energy Usage:</span>
-                    <span
-                      id="modalEnergyAmount"
-                      class="text-2xl font-bold text-blue-900"
-                    ></span>
-                  </div>
-                  <p
-                    id="modalEnergyComparison"
-                    class="text-blue-700 text-sm bg-white bg-opacity-50 rounded-lg p-3"
-                  ></p>
-                </div>
-              </div>
-
-              <!-- Carbon Emissions -->
-              <div class="bg-red-50 rounded-xl p-6">
-                <h3
-                  class="text-lg font-semibold text-red-900 mb-4 flex items-center"
-                >
-                  <span class="mr-2">🏭</span>
-                  Annual Carbon Emissions
-                </h3>
-                <div class="space-y-3">
-                  <div class="flex justify-between items-center">
-                    <span class="font-medium text-red-800">CO2 Emissions:</span>
-                    <span
-                      id="modalCO2Amount"
-                      class="text-2xl font-bold text-red-900"
-                    ></span>
-                  </div>
-                  <p
-                    id="modalCO2Comparison"
-                    class="text-red-700 text-sm bg-white bg-opacity-50 rounded-lg p-3"
-                  ></p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Source Information -->
-            <div class="bg-gray-50 rounded-xl p-6">
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">
-                Data Source
-              </h3>
-              <div class="flex items-center space-x-2">
-                <span class="text-gray-600">📊</span>
-                <a
-                  id="modalSource"
-                  href="#"
-                  target="_blank"
-                  class="text-blue-600 hover:text-blue-800 underline text-sm"
-                ></a>
-              </div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex justify-center space-x-4 pt-4">
-              <button
-                onclick="visitWebsite()"
-                id="visitWebsiteBtn"
-                class="bg-green-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition-colors font-medium"
-              >
-                Visit Website
-              </button>
-              <button
-                onclick="closeModal()"
-                class="bg-gray-200 text-gray-800 px-6 py-3 rounded-full hover:bg-gray-300 transition-colors font-medium"
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 py-12 mt-16">
+    <footer class="bg-gray-900 text-gray-300 py-12">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <div class="flex items-center mb-4 md:mb-0">
@@ -399,7 +293,6 @@
         </div>
       </div>
     </footer>
-
-    <script src="app.js"></script>
+    <script src="search.js"></script>
   </body>
 </html>
