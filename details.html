@@ -138,11 +138,14 @@
           <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
             <div class="flex items-center space-x-6 mb-6">
               <div
-                class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center"
+                class="w-16 h-16 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center"
               >
-                <span class="text-3xl"
-                  ><i class="fa-solid fa-earth-americas"></i
-                ></span>
+                <img
+                  id="websiteLogo"
+                  src=""
+                  alt="Website Logo"
+                  class="w-full h-full object-contain"
+                />
               </div>
               <div class="flex-1">
                 <h1
@@ -337,6 +340,16 @@
     <script>
       const toggleBtn = document.getElementById("menu-toggle");
       const mobileMenu = document.getElementById("mobile-menu");
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const website = urlParams.get("website");
+
+      // Set title and other fields as usual...
+      document.getElementById("websiteTitle").textContent = website;
+
+      // Set logo
+      const logoUrl = `https://www.google.com/s2/favicons?domain=${website}&sz=64`;
+      document.getElementById("websiteLogo").src = logoUrl;
 
       toggleBtn.addEventListener("click", () => {
         mobileMenu.classList.toggle("hidden");
