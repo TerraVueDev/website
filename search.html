@@ -104,7 +104,7 @@
             />
             <button
               id="searchButton"
-              class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition-colors"
+              class="absolute right-2 top-10/12 transform -translate-y-1/2 bg-green-500 text-white p-3 rounded-full hover:bg-green-600 transition-colors"
             >
               <svg
                 class="w-5 h-5"
@@ -153,7 +153,9 @@
 
         <!-- Results Container -->
         <div id="resultsContainer" class="hidden">
-          <div class="flex justify-between items-center mb-8">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-center mb-8 sm:justify content-between"
+          >
             <h2 class="text-2xl font-bold text-gray-900">
               Search Results
               <span id="resultCount" class="text-green-600"></span>
