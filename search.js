@@ -172,7 +172,7 @@ function displayResults(results, query) {
 function createResultCard(result) {
   const card = document.createElement("div");
   card.className =
-    "result-card bg-white rounded-2xl shadow-lg p-6 border border-gray-100";
+    "result-card bg-white rounded-2xl shadow-lg p-6 border border-gray-100 flex flex-col";
 
   // Add click handler to navigate to details page
   card.addEventListener("click", () => {
@@ -183,9 +183,6 @@ function createResultCard(result) {
 
   card.innerHTML = `
           <div class="flex items-center space-x-4 mb-4">
-            <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-              <span class="text-2xl">🌐</span>
-            </div>
             <div class="flex-1">
               <h3 class="text-xl font-semibold text-gray-900 mb-1">${
                 result.website
@@ -204,13 +201,13 @@ function createResultCard(result) {
             result.description
           }</p>
           
-          <div class="flex justify-between items-center">
-            <span class="text-sm text-gray-500">Click for details</span>
-            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </div>
-        `;
+       <div class="mt-auto flex justify-between items-center pt-4 border-t border-gray-100">
+    <span class="text-sm text-gray-500">Click for details</span>
+    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+    </svg>
+  </div>
+`;
 
   return card;
 }
