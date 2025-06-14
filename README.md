@@ -5,7 +5,8 @@
 
 ---
 
-### This repo holds Terravue website to introduce users about Terravue before trying Terravue browser extension or Android app.
+<h1>Terravue Website</h1>
+<p>This repo holds Terravue website to introduce to users about Terravue before trying Terravue browser extension or Android app.</p>
 
 ## Features
 
