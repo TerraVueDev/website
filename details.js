@@ -22,6 +22,54 @@ function formatCategoryName(categoryKey) {
     .join(" ");
 }
 
+// Show toast notification
+function showToast(message, type = "success") {
+  // Remove existing toast if any
+  const existingToast = document.getElementById("toast-notification");
+  if (existingToast) {
+    existingToast.remove();
+  }
+
+  // Create toast element
+  const toast = document.createElement("div");
+  toast.id = "toast-notification";
+
+  const bgColor = type === "success" ? "bg-green-500" : "bg-blue-500";
+  const iconColor = type === "success" ? "text-green-200" : "text-blue-200";
+  const icon = type === "success" ? "✓" : "ℹ";
+
+  toast.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-3 z-50 transform translate-x-full transition-transform duration-300 ease-out`;
+
+  toast.innerHTML = `
+    <span class="${iconColor} text-lg font-bold">${icon}</span>
+    <span class="font-medium">${message}</span>
+    <button onclick="hideToast()" class="ml-2 text-white hover:text-gray-200 text-lg leading-none">&times;</button>
+  `;
+
+  document.body.appendChild(toast);
+
+  // Trigger animation
+  setTimeout(() => {
+    toast.classList.remove("translate-x-full");
+  }, 10);
+
+  // Auto hide after 3 seconds
+  setTimeout(() => {
+    hideToast();
+  }, 3000);
+}
+
+// Hide toast notification
+function hideToast() {
+  const toast = document.getElementById("toast-notification");
+  if (toast) {
+    toast.classList.add("translate-x-full");
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  }
+}
+
 // Load data and display details
 async function loadData() {
   try {
@@ -143,17 +191,64 @@ function visitWebsite() {
 // Share link
 function shareLink() {
   if (navigator.share) {
-    navigator.share({
-      title: `${currentWebsite} - Environmental Impact`,
-      text: `Check out the environmental impact of ${currentWebsite}`,
-      url: window.location.href,
-    });
+    navigator
+      .share({
+        title: `${currentWebsite} - Environmental Impact`,
+        text: `Check out the environmental impact of ${currentWebsite}`,
+        url: window.location.href,
+      })
+      .then(() => {
+        showToast("Shared successfully!", "success");
+      })
+      .catch((error) => {
+        // If native sharing fails, fall back to copying
+        if (error.name !== "AbortError") {
+          copyToClipboard();
+        }
+      });
   } else {
     // Fallback to copying URL
-    navigator.clipboard.writeText(window.location.href).then(() => {
-      alert("Link copied to clipboard!");
-    });
+    copyToClipboard();
   }
+}
+
+// Copy link to clipboard
+function copyToClipboard() {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard
+      .writeText(window.location.href)
+      .then(() => {
+        showToast("Link copied to clipboard!", "success");
+      })
+      .catch(() => {
+        // Fallback for older browsers
+        fallbackCopyToClipboard();
+      });
+  } else {
+    // Fallback for older browsers
+    fallbackCopyToClipboard();
+  }
+}
+
+// Fallback copy method for older browsers
+function fallbackCopyToClipboard() {
+  const textArea = document.createElement("textarea");
+  textArea.value = window.location.href;
+  textArea.style.position = "fixed";
+  textArea.style.left = "-999999px";
+  textArea.style.top = "-999999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+
+  try {
+    document.execCommand("copy");
+    showToast("Link copied to clipboard!", "success");
+  } catch (err) {
+    showToast("Unable to copy link", "info");
+  }
+
+  document.body.removeChild(textArea);
 }
 
 // Go back to search
