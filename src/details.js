@@ -86,7 +86,7 @@ function setAIDescriptionToCache(website, description) {
   }
 }
 
-// Generate AI Description
+// Generate AI Description (async, non-blocking)
 async function generateWebsiteDescription(website, categoryKey, categoryData) {
   // Check if AI is available
   if (!("LanguageModel" in self)) {
@@ -139,51 +139,79 @@ async function generateWebsiteDescription(website, categoryKey, categoryData) {
   }
 }
 
-// Update website description with AI or fallback
-async function updateWebsiteDescription(website, categoryKey, categoryData) {
+// Update website description with AI or fallback (async, non-blocking)
+async function updateWebsiteDescriptionAsync(
+  website,
+  categoryKey,
+  categoryData
+) {
   const descriptionElement = document.getElementById("websiteDescription");
   if (!descriptionElement) return;
 
-  // Show loading state
-  descriptionElement.innerHTML = `
-    <div class="flex items-center text-gray-500">
-      <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500 mr-2"></div>
-      Generating description...
-    </div>
+  // Set fallback description immediately so page is not blocked
+  const fallbackDescription =
+    categoryData.description ||
+    `${website} is a ${formatCategoryName(
+      categoryKey
+    ).toLowerCase()} service with ${categoryData.impact} environmental impact.`;
+
+  descriptionElement.textContent = fallbackDescription;
+
+  // Show loading indicator in a subtle way
+  const loadingIndicator = document.createElement("div");
+  loadingIndicator.id = "ai-loading-indicator";
+  loadingIndicator.className = "flex items-center text-gray-400 text-sm mt-2";
+  loadingIndicator.innerHTML = `
+    <div class="animate-spin rounded-full h-3 w-3 border border-gray-300 border-t-green-500 mr-2"></div>
+    Generating enhanced description...
   `;
+  descriptionElement.parentElement.appendChild(loadingIndicator);
 
   try {
-    // Try to generate AI description
+    // Generate AI description asynchronously
     const aiDescription = await generateWebsiteDescription(
       website,
       categoryKey,
       categoryData
     );
 
+    // Remove loading indicator
+    const indicator = document.getElementById("ai-loading-indicator");
+    if (indicator) {
+      indicator.remove();
+    }
+
     if (aiDescription) {
-      descriptionElement.textContent = aiDescription;
-    } else {
-      // Fallback to original description or generic message
-      const fallbackDescription =
-        categoryData.description ||
-        `${website} is a ${formatCategoryName(
-          categoryKey
-        ).toLowerCase()} service with ${
-          categoryData.impact
-        } environmental impact.`;
-      descriptionElement.textContent = fallbackDescription;
+      // Smoothly update with AI description
+      descriptionElement.style.opacity = "0.7";
+      setTimeout(() => {
+        descriptionElement.textContent = aiDescription;
+        descriptionElement.style.opacity = "1";
+
+        // Add a subtle success indicator
+        const successIndicator = document.createElement("div");
+        successIndicator.className = "text-green-600 text-xs mt-1 opacity-50";
+        successIndicator.innerHTML = "✓ Enhanced with AI";
+        descriptionElement.parentElement.appendChild(successIndicator);
+
+        // Remove success indicator after 3 seconds
+        setTimeout(() => {
+          if (successIndicator.parentElement) {
+            successIndicator.remove();
+          }
+        }, 3000);
+      }, 150);
     }
   } catch (error) {
     console.error("Error updating website description:", error);
-    // Fallback to original description
-    const fallbackDescription =
-      categoryData.description ||
-      `${website} is a ${formatCategoryName(
-        categoryKey
-      ).toLowerCase()} service with ${
-        categoryData.impact
-      } environmental impact.`;
-    descriptionElement.textContent = fallbackDescription;
+
+    // Remove loading indicator on error
+    const indicator = document.getElementById("ai-loading-indicator");
+    if (indicator) {
+      indicator.remove();
+    }
+
+    // Description remains as fallback, no need to change anything
   }
 }
 
@@ -314,13 +342,20 @@ async function loadData() {
       // Find the website data in cache
       const websiteData = cachedData[currentWebsite];
       if (websiteData) {
-        await populateDetails(
+        // Populate details immediately (non-blocking)
+        populateDetails(currentWebsite, websiteData.category, websiteData);
+
+        // Show content immediately
+        document.getElementById("loadingState").classList.add("hidden");
+        document.getElementById("detailsContent").classList.remove("hidden");
+
+        // Update AI description asynchronously (non-blocking)
+        updateWebsiteDescriptionAsync(
           currentWebsite,
           websiteData.category,
           websiteData
         );
-        document.getElementById("loadingState").classList.add("hidden");
-        document.getElementById("detailsContent").classList.remove("hidden");
+
         return;
       } else {
         console.log("Website not found in cache, fetching from API");
@@ -371,11 +406,15 @@ async function loadData() {
     // Cache the processed data
     setCachedData(combinedData);
 
-    // Populate the page
-    await populateDetails(currentWebsite, categoryKey, category);
+    // Populate the page immediately (non-blocking)
+    populateDetails(currentWebsite, categoryKey, category);
 
+    // Show content immediately
     document.getElementById("loadingState").classList.add("hidden");
     document.getElementById("detailsContent").classList.remove("hidden");
+
+    // Update AI description asynchronously (non-blocking)
+    updateWebsiteDescriptionAsync(currentWebsite, categoryKey, category);
   } catch (error) {
     console.error("Error loading data:", error);
     document.getElementById("loadingState").classList.add("hidden");
@@ -383,8 +422,8 @@ async function loadData() {
   }
 }
 
-// Populate details on the page
-async function populateDetails(website, categoryKey, category) {
+// Populate details on the page (synchronous, immediate)
+function populateDetails(website, categoryKey, category) {
   // Header information
   document.getElementById("websiteTitle").textContent = website;
   document.getElementById("websiteCategory").textContent =
@@ -393,8 +432,16 @@ async function populateDetails(website, categoryKey, category) {
     category.impact
   );
 
-  // Generate AI description (this will handle the DOM manipulation)
-  await updateWebsiteDescription(website, categoryKey, category);
+  // Set initial fallback description (will be updated by AI async)
+  const descriptionElement = document.getElementById("websiteDescription");
+  if (descriptionElement) {
+    const fallbackDescription =
+      category.description ||
+      `${website} is a ${formatCategoryName(
+        categoryKey
+      ).toLowerCase()} service with ${category.impact} environmental impact.`;
+    descriptionElement.textContent = fallbackDescription;
+  }
 
   // Show/hide estimates section
   const estimatesSection = document.getElementById("estimatesSection");
