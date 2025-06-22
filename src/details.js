@@ -34,7 +34,7 @@ function showToast(message, type = "success") {
   const toast = document.createElement("div");
   toast.id = "toast-notification";
 
-  const bgColor = type === "success" ? "bg-green-500" : "bg-blue-500";
+  const bgColor = type === "success" ? "bg-green-600" : "bg-blue-500";
   const iconColor = type === "success" ? "text-green-200" : "text-blue-200";
   const icon = type === "success" ? "✓" : "ℹ";
 
