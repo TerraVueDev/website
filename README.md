@@ -29,7 +29,11 @@
    npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css
    ```
 
-4. Open index.html file manually to access it via browser
+4. Run localhost server via terminal:
+
+    ```bash
+   npm run dev
+   ```
 
 ## Contributing
 
