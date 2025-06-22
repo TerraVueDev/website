@@ -1,6 +1,45 @@
 let allData = {};
 let filteredResults = [];
 
+// Cache configuration
+const CACHE_KEY = "terraVueData";
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+// Cache utility functions
+function getCachedData() {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+
+    const { data, timestamp } = JSON.parse(cached);
+    const now = Date.now();
+
+    // Check if cache is still valid
+    if (now - timestamp > CACHE_DURATION) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.warn("Error reading from cache:", error);
+    localStorage.removeItem(CACHE_KEY);
+    return null;
+  }
+}
+
+function setCachedData(data) {
+  try {
+    const cacheEntry = {
+      data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheEntry));
+  } catch (error) {
+    console.warn("Error writing to cache:", error);
+  }
+}
+
 // Get impact badge HTML
 function getImpactBadge(impact) {
   const badges = {
@@ -22,9 +61,23 @@ function formatCategoryName(categoryKey) {
     .join(" ");
 }
 
-// Load data from GitHub
+// Load data from GitHub with caching
 async function loadData() {
   try {
+    // Check cache first
+    const cachedData = getCachedData();
+    if (cachedData) {
+      allData = cachedData;
+      console.log(
+        "Data loaded from cache:",
+        Object.keys(allData).length,
+        "websites"
+      );
+      return;
+    }
+
+    // Fetch from API if no cache
+    console.log("Fetching fresh data from API...");
     const [linksResponse, categoriesResponse] = await Promise.all([
       fetch(
         "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/links.json"
@@ -51,6 +104,9 @@ async function loadData() {
         };
       }
     }
+
+    // Cache the processed data
+    setCachedData(allData);
 
     console.log(
       "Data loaded successfully:",
@@ -184,11 +240,12 @@ function createResultCard(result) {
   card.innerHTML = `
           <div class="flex items-center space-x-4 mb-4">
             <div class="flex-1">
-              <h3 class="text-xl font-semibold text-gray-900 mb-1">${result.website
-    }</h3>
+              <h3 class="text-xl font-semibold text-gray-900 mb-1">${
+                result.website
+              }</h3>
               <p class="text-gray-600 text-sm">${formatCategoryName(
-      result.category
-    )}</p>
+                result.category
+              )}</p>
             </div>
           </div>
           
@@ -196,8 +253,9 @@ function createResultCard(result) {
             ${getImpactBadge(result.impact)}
           </div>
           
-          <p class="text-gray-700 text-sm mb-4 line-clamp-3">${result.description
-    }</p>
+          <p class="text-gray-700 text-sm mb-4 line-clamp-3">${
+            result.description
+          }</p>
           
        <div class="mt-auto flex justify-between items-center pt-4 border-t border-gray-100">
     <span class="text-sm text-gray-500">Click for details</span>

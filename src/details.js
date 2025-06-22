@@ -1,6 +1,227 @@
 let currentWebsite = null;
 let allData = {};
 
+// AI Session Management
+let aiSession = null;
+
+// Cache configuration (same as search.js)
+const CACHE_KEY = "terraVueData";
+const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+// AI Description Cache
+const AI_CACHE_KEY = "terraVueAIDescriptions";
+const AI_CACHE_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+
+// AI Session Management Functions
+async function getAISession(params) {
+  if (!aiSession) {
+    try {
+      aiSession = await LanguageModel.create(params);
+    } catch (e) {
+      console.error("Failed to create AI session:", e);
+      throw new Error("Language model not available.");
+    }
+  }
+  return aiSession;
+}
+
+async function runPrompt(prompt, params) {
+  try {
+    const session = await getAISession(params);
+    return await session.prompt(prompt);
+  } catch (e) {
+    console.error("Prompt execution failed:", e);
+    resetAISession();
+    throw e;
+  }
+}
+
+function resetAISession() {
+  if (aiSession) {
+    aiSession.destroy();
+    aiSession = null;
+  }
+}
+
+// AI Description Cache Functions
+function getAIDescriptionFromCache(website) {
+  try {
+    const cached = localStorage.getItem(AI_CACHE_KEY);
+    if (!cached) return null;
+
+    const { data, timestamp } = JSON.parse(cached);
+    const now = Date.now();
+
+    // Check if cache is still valid
+    if (now - timestamp > AI_CACHE_DURATION) {
+      localStorage.removeItem(AI_CACHE_KEY);
+      return null;
+    }
+
+    return data[website] || null;
+  } catch (error) {
+    console.warn("Error reading AI description from cache:", error);
+    localStorage.removeItem(AI_CACHE_KEY);
+    return null;
+  }
+}
+
+function setAIDescriptionToCache(website, description) {
+  try {
+    let cached = localStorage.getItem(AI_CACHE_KEY);
+    let cacheData = { data: {}, timestamp: Date.now() };
+
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      cacheData = {
+        data: parsed.data || {},
+        timestamp: parsed.timestamp || Date.now(),
+      };
+    }
+
+    cacheData.data[website] = description;
+    localStorage.setItem(AI_CACHE_KEY, JSON.stringify(cacheData));
+  } catch (error) {
+    console.warn("Error writing AI description to cache:", error);
+  }
+}
+
+// Generate AI Description
+async function generateWebsiteDescription(website, categoryKey, categoryData) {
+  // Check if AI is available
+  if (!("LanguageModel" in self)) {
+    console.log("Language model not available");
+    return null;
+  }
+
+  // Check cache first
+  const cachedDescription = getAIDescriptionFromCache(website);
+  if (cachedDescription) {
+    console.log("Using cached AI description for:", website);
+    return cachedDescription;
+  }
+
+  try {
+    const categoryName = formatCategoryName(categoryKey);
+    const impactLevel = categoryData.impact;
+
+    const prompt = `Generate a brief, informative description about ${website} and its environmental impact. The website belongs to the ${categoryName} category and has a ${impactLevel} environmental impact. 
+
+    Focus on:
+    - What the website/service does
+    - Why it has environmental impact (energy usage, data centers, user behavior, etc.)
+    - Keep it concise (2-3 sentences maximum)
+    - Write in a neutral, informative tone
+    - Don't use markdown formatting
+
+    Start your response with: "${website} is"`;
+
+    const params = {
+      initialPrompts: [
+        {
+          role: "system",
+          content:
+            "You are an environmental impact analyst. Generate concise, factual descriptions about websites and their environmental impact. Do not use markdown formatting. Keep responses brief and informative.",
+        },
+      ],
+    };
+
+    console.log("Generating AI description for:", website);
+    const description = await runPrompt(prompt, params);
+
+    // Cache the generated description
+    setAIDescriptionToCache(website, description);
+
+    return description;
+  } catch (error) {
+    console.error("Failed to generate AI description:", error);
+    return null;
+  }
+}
+
+// Update website description with AI or fallback
+async function updateWebsiteDescription(website, categoryKey, categoryData) {
+  const descriptionElement = document.getElementById("websiteDescription");
+  if (!descriptionElement) return;
+
+  // Show loading state
+  descriptionElement.innerHTML = `
+    <div class="flex items-center text-gray-500">
+      <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500 mr-2"></div>
+      Generating description...
+    </div>
+  `;
+
+  try {
+    // Try to generate AI description
+    const aiDescription = await generateWebsiteDescription(
+      website,
+      categoryKey,
+      categoryData
+    );
+
+    if (aiDescription) {
+      descriptionElement.textContent = aiDescription;
+    } else {
+      // Fallback to original description or generic message
+      const fallbackDescription =
+        categoryData.description ||
+        `${website} is a ${formatCategoryName(
+          categoryKey
+        ).toLowerCase()} service with ${
+          categoryData.impact
+        } environmental impact.`;
+      descriptionElement.textContent = fallbackDescription;
+    }
+  } catch (error) {
+    console.error("Error updating website description:", error);
+    // Fallback to original description
+    const fallbackDescription =
+      categoryData.description ||
+      `${website} is a ${formatCategoryName(
+        categoryKey
+      ).toLowerCase()} service with ${
+        categoryData.impact
+      } environmental impact.`;
+    descriptionElement.textContent = fallbackDescription;
+  }
+}
+
+// Cache utility functions
+function getCachedData() {
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+
+    const { data, timestamp } = JSON.parse(cached);
+    const now = Date.now();
+
+    // Check if cache is still valid
+    if (now - timestamp > CACHE_DURATION) {
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.warn("Error reading from cache:", error);
+    localStorage.removeItem(CACHE_KEY);
+    return null;
+  }
+}
+
+function setCachedData(data) {
+  try {
+    const cacheEntry = {
+      data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheEntry));
+  } catch (error) {
+    console.warn("Error writing to cache:", error);
+  }
+}
+
 // Get impact badge HTML
 function getImpactBadge(impact) {
   const badges = {
@@ -70,7 +291,7 @@ function hideToast() {
   }
 }
 
-// Load data and display details
+// Load data and display details with caching
 async function loadData() {
   try {
     document.getElementById("loadingState").classList.remove("hidden");
@@ -85,6 +306,30 @@ async function loadData() {
       throw new Error("No website specified");
     }
 
+    // Check cache first
+    const cachedData = getCachedData();
+    if (cachedData) {
+      console.log("Using cached data for details page");
+
+      // Find the website data in cache
+      const websiteData = cachedData[currentWebsite];
+      if (websiteData) {
+        await populateDetails(
+          currentWebsite,
+          websiteData.category,
+          websiteData
+        );
+        document.getElementById("loadingState").classList.add("hidden");
+        document.getElementById("detailsContent").classList.remove("hidden");
+        return;
+      } else {
+        console.log("Website not found in cache, fetching from API");
+      }
+    } else {
+      console.log("No cache found, fetching fresh data from API");
+    }
+
+    // Fetch from API if no cache or website not in cache
     const [linksResponse, categoriesResponse] = await Promise.all([
       fetch(
         "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/links.json"
@@ -112,8 +357,22 @@ async function loadData() {
       throw new Error("Category data not found");
     }
 
+    // Build combined data structure for caching
+    const combinedData = {};
+    for (const [website, catKey] of Object.entries(linksData)) {
+      if (categoriesData[catKey]) {
+        combinedData[website] = {
+          category: catKey,
+          ...categoriesData[catKey],
+        };
+      }
+    }
+
+    // Cache the processed data
+    setCachedData(combinedData);
+
     // Populate the page
-    populateDetails(currentWebsite, categoryKey, category);
+    await populateDetails(currentWebsite, categoryKey, category);
 
     document.getElementById("loadingState").classList.add("hidden");
     document.getElementById("detailsContent").classList.remove("hidden");
@@ -125,7 +384,7 @@ async function loadData() {
 }
 
 // Populate details on the page
-function populateDetails(website, categoryKey, category) {
+async function populateDetails(website, categoryKey, category) {
   // Header information
   document.getElementById("websiteTitle").textContent = website;
   document.getElementById("websiteCategory").textContent =
@@ -133,8 +392,9 @@ function populateDetails(website, categoryKey, category) {
   document.getElementById("impactBadge").innerHTML = getImpactBadge(
     category.impact
   );
-  document.getElementById("websiteDescription").textContent =
-    category.description;
+
+  // Generate AI description (this will handle the DOM manipulation)
+  await updateWebsiteDescription(website, categoryKey, category);
 
   // Show/hide estimates section
   const estimatesSection = document.getElementById("estimatesSection");
@@ -256,7 +516,15 @@ function goBack() {
   window.history.back();
 }
 
+// Cleanup function for AI session
+function cleanup() {
+  resetAISession();
+}
+
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
 });
+
+// Cleanup on page unload
+window.addEventListener("beforeunload", cleanup);
