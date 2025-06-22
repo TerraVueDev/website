@@ -26,7 +26,7 @@
 3. Generate TailwindCSS:
 
    ```bash
-   npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css
+   npx @tailwindcss/cli -i ./assets/css/input.css -o ./assets/css/output.css --watch
    ```
 
 4. Run localhost server via terminal:
