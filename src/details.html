@@ -97,7 +97,7 @@
         <div class="bg-white rounded-2xl shadow-lg px-8 py-4 mb-8">
           <div class="flex items-center space-x-6 mb-6">
             <div class="w-16 h-16 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center">
-              <img id="websiteLogo" src="" alt="Website Logo" class="w-full h-full object-contain" />
+              <img id="websiteIcon" alt="Website Logo" class="w-12 h-12 object-contain" />
             </div>
             <div class="flex-1">
               <h1 id="websiteTitle" class="text-3xl font-bold text-gray-900 mb-2"></h1>
@@ -244,10 +244,6 @@
 
     // Set title and other fields as usual...
     document.getElementById("websiteTitle").textContent = website;
-
-    // Set logo
-    const logoUrl = `https://www.google.com/s2/favicons?domain=${website}&sz=64`;
-    document.getElementById("websiteLogo").src = logoUrl;
 
     toggleBtn.addEventListener("click", () => {
       mobileMenu.classList.toggle("hidden");

@@ -143,16 +143,20 @@ async function generateWebsiteDescription(website, categoryKey, categoryData) {
 async function updateWebsiteDescriptionAsync(
   website,
   categoryKey,
-  categoryData
+  categoryData,
 ) {
   const descriptionElement = document.getElementById("websiteDescription");
   if (!descriptionElement) return;
 
+  // Fix: Access the actual category data - check if it's nested in categoryData
+  const actualCategoryData = categoryData.categoryData || categoryData;
+
   // Set fallback description immediately so page is not blocked
   const fallbackDescription =
-    categoryData.description ||
+    categoryData.description || // Try the direct description first
+    actualCategoryData.description || // Then try nested description
     `${website} is a ${formatCategoryName(
-      categoryKey
+      categoryKey,
     ).toLowerCase()} service with ${categoryData.impact} environmental impact.`;
 
   descriptionElement.textContent = fallbackDescription;
@@ -172,7 +176,7 @@ async function updateWebsiteDescriptionAsync(
     const aiDescription = await generateWebsiteDescription(
       website,
       categoryKey,
-      categoryData
+      actualCategoryData,
     );
 
     // Remove loading indicator
@@ -191,7 +195,7 @@ async function updateWebsiteDescriptionAsync(
         // Add a subtle success indicator
         const successIndicator = document.createElement("div");
         successIndicator.className = "text-green-600 text-xs mt-1 opacity-50";
-        successIndicator.innerHTML = "✓ Enhanced with AI";
+        successIndicator.innerHTML = "✓ Enhanced with Gemini Nano";
         descriptionElement.parentElement.appendChild(successIndicator);
 
         // Remove success indicator after 3 seconds
@@ -320,6 +324,7 @@ function hideToast() {
 }
 
 // Load data and display details with caching
+// Load data and display details with caching
 async function loadData() {
   try {
     document.getElementById("loadingState").classList.remove("hidden");
@@ -334,16 +339,26 @@ async function loadData() {
       throw new Error("No website specified");
     }
 
+    console.log("Loading data for website:", currentWebsite);
+
     // Check cache first
     const cachedData = getCachedData();
     if (cachedData) {
       console.log("Using cached data for details page");
+      console.log("Cached data structure:", cachedData);
 
       // Find the website data in cache
       const websiteData = cachedData[currentWebsite];
       if (websiteData) {
+        console.log("Website data found in cache:", websiteData);
+
         // Populate details immediately (non-blocking)
-        populateDetails(currentWebsite, websiteData.category, websiteData);
+        populateDetails(
+          currentWebsite,
+          websiteData.category,
+          websiteData,
+          websiteData.icon,
+        );
 
         // Show content immediately
         document.getElementById("loadingState").classList.add("hidden");
@@ -353,7 +368,7 @@ async function loadData() {
         updateWebsiteDescriptionAsync(
           currentWebsite,
           websiteData.category,
-          websiteData
+          websiteData,
         );
 
         return;
@@ -367,10 +382,10 @@ async function loadData() {
     // Fetch from API if no cache or website not in cache
     const [linksResponse, categoriesResponse] = await Promise.all([
       fetch(
-        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/links.json"
+        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/links.json",
       ),
       fetch(
-        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/categories.json"
+        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/categories.json",
       ),
     ]);
 
@@ -381,33 +396,48 @@ async function loadData() {
     const linksData = await linksResponse.json();
     const categoriesData = await categoriesResponse.json();
 
-    // Find the category for the current website
-    const categoryKey = linksData[currentWebsite];
-    if (!categoryKey) {
+    console.log("Links data loaded:", linksData);
+    console.log("Categories data loaded:", categoriesData);
+
+    // Find the website data in links.json
+    const websiteInfo = linksData[currentWebsite];
+    if (!websiteInfo) {
       throw new Error("Website not found in database");
     }
+
+    console.log("Website info from links.json:", websiteInfo);
+
+    // Get category key and icon from website info
+    const categoryKey = websiteInfo.categories;
+    const iconKey = websiteInfo.icon;
 
     const category = categoriesData[categoryKey];
     if (!category) {
       throw new Error("Category data not found");
     }
 
+    console.log("Category data from categories.json:", category);
+
     // Build combined data structure for caching
     const combinedData = {};
-    for (const [website, catKey] of Object.entries(linksData)) {
+    for (const [website, websiteData] of Object.entries(linksData)) {
+      const catKey = websiteData.categories;
       if (categoriesData[catKey]) {
         combinedData[website] = {
           category: catKey,
+          icon: websiteData.icon,
           ...categoriesData[catKey],
         };
       }
     }
 
+    console.log("Combined data structure:", combinedData);
+
     // Cache the processed data
     setCachedData(combinedData);
 
     // Populate the page immediately (non-blocking)
-    populateDetails(currentWebsite, categoryKey, category);
+    populateDetails(currentWebsite, categoryKey, category, iconKey);
 
     // Show content immediately
     document.getElementById("loadingState").classList.add("hidden");
@@ -422,15 +452,50 @@ async function loadData() {
   }
 }
 
-// Populate details on the page (synchronous, immediate)
-function populateDetails(website, categoryKey, category) {
-  // Header information
-  document.getElementById("websiteTitle").textContent = website;
+/// Populate details on the page (synchronous, immediate)
+function populateDetails(website, categoryKey, category, iconKey) {
+  console.log("Populating details for:", website);
+  console.log("Category data:", category);
+  console.log("Category key:", categoryKey);
+  console.log("Icon key:", iconKey);
+
+  // Header information with icon
+  const websiteTitleElement = document.getElementById("websiteTitle");
+  const websiteIconElement = document.getElementById("websiteIcon");
+
+  websiteTitleElement.textContent = website;
   document.getElementById("websiteCategory").textContent =
     formatCategoryName(categoryKey);
   document.getElementById("impactBadge").innerHTML = getImpactBadge(
-    category.impact
+    category.impact,
   );
+
+  // Update website icon with fallback hierarchy
+  if (websiteIconElement) {
+    if (iconKey && iconKey !== "none") {
+      // Use Simple Icons CDN
+      websiteIconElement.src = `https://cdn.simpleicons.org/${iconKey}`;
+      websiteIconElement.alt = `${iconKey} icon`;
+
+      // Add error handling - fallback to favicon if Simple Icons fails
+      websiteIconElement.onerror = function () {
+        console.warn(
+          `Simple Icons failed for: ${iconKey}, trying favicon fallback`,
+        );
+        setFallbackIcon(websiteIconElement, website);
+      };
+
+      websiteIconElement.onload = function () {
+        console.log(`Simple Icons loaded successfully for: ${iconKey}`);
+      };
+    } else {
+      // If iconKey is "none" or not provided, use favicon fallback
+      console.log(
+        `Icon key is "${iconKey}" for ${website}, using favicon fallback`,
+      );
+      setFallbackIcon(websiteIconElement, website);
+    }
+  }
 
   // Set initial fallback description (will be updated by AI async)
   const descriptionElement = document.getElementById("websiteDescription");
@@ -438,51 +503,182 @@ function populateDetails(website, categoryKey, category) {
     const fallbackDescription =
       category.description ||
       `${website} is a ${formatCategoryName(
-        categoryKey
+        categoryKey,
       ).toLowerCase()} service with ${category.impact} environmental impact.`;
     descriptionElement.textContent = fallbackDescription;
   }
 
-  // Show/hide estimates section
+  // Fix: Access the actual category data - check if it's nested in categoryData
+  const actualCategoryData = category.categoryData || category;
+  console.log("Actual category data for estimates:", actualCategoryData);
+  console.log("Annual estimate data:", actualCategoryData.annual_estimate);
+
+  // Show/hide estimates section with better error handling
   const estimatesSection = document.getElementById("estimatesSection");
   const noDataMessage = document.getElementById("noDataMessage");
 
-  if (category.annual_estimate) {
+  if (
+    actualCategoryData.annual_estimate &&
+    typeof actualCategoryData.annual_estimate === "object"
+  ) {
+    console.log("Annual estimate found, populating data...");
+
     estimatesSection.classList.remove("hidden");
     noDataMessage.classList.add("hidden");
 
-    // Energy data
-    document.getElementById("energyAmount").textContent =
-      category.annual_estimate.wh;
-    document.getElementById("energyComparison").textContent =
-      category.annual_estimate["wh-comparison"];
+    // Energy data with null checks
+    const energyAmountEl = document.getElementById("energyAmount");
+    const energyComparisonEl = document.getElementById("energyComparison");
 
-    // CO2 data
-    document.getElementById("co2Amount").textContent =
-      category.annual_estimate.co2;
-    document.getElementById("co2Comparison").textContent =
-      category.annual_estimate["co2-comparison"];
+    if (energyAmountEl && actualCategoryData.annual_estimate.wh) {
+      energyAmountEl.textContent = actualCategoryData.annual_estimate.wh;
+      console.log("Energy amount set:", actualCategoryData.annual_estimate.wh);
+    } else {
+      console.warn("Energy amount element not found or data missing");
+    }
+
+    if (
+      energyComparisonEl &&
+      actualCategoryData.annual_estimate["wh-comparison"]
+    ) {
+      energyComparisonEl.textContent =
+        actualCategoryData.annual_estimate["wh-comparison"];
+      console.log(
+        "Energy comparison set:",
+        actualCategoryData.annual_estimate["wh-comparison"],
+      );
+    } else {
+      console.warn("Energy comparison element not found or data missing");
+    }
+
+    // CO2 data with null checks
+    const co2AmountEl = document.getElementById("co2Amount");
+    const co2ComparisonEl = document.getElementById("co2Comparison");
+
+    if (co2AmountEl && actualCategoryData.annual_estimate.co2) {
+      co2AmountEl.textContent = actualCategoryData.annual_estimate.co2;
+      console.log("CO2 amount set:", actualCategoryData.annual_estimate.co2);
+    } else {
+      console.warn("CO2 amount element not found or data missing");
+    }
+
+    if (
+      co2ComparisonEl &&
+      actualCategoryData.annual_estimate["co2-comparison"]
+    ) {
+      co2ComparisonEl.textContent =
+        actualCategoryData.annual_estimate["co2-comparison"];
+      console.log(
+        "CO2 comparison set:",
+        actualCategoryData.annual_estimate["co2-comparison"],
+      );
+    } else {
+      console.warn("CO2 comparison element not found or data missing");
+    }
   } else {
+    console.log("No annual estimate data found, showing no data message");
     estimatesSection.classList.add("hidden");
     noDataMessage.classList.remove("hidden");
   }
 
-  // Source link
+  // Source link with better error handling - also check nested data
   const sourceLink = document.getElementById("sourceLink");
   const noSourceText = document.getElementById("noSourceText");
 
-  if (category.source) {
-    sourceLink.href = category.source;
-    sourceLink.textContent = category.source;
-    sourceLink.classList.remove("hidden");
-    noSourceText.classList.add("hidden");
+  console.log("Source data:", actualCategoryData.source);
+
+  if (sourceLink && noSourceText) {
+    if (actualCategoryData.source && actualCategoryData.source.trim() !== "") {
+      sourceLink.href = actualCategoryData.source;
+      sourceLink.textContent = actualCategoryData.source;
+      sourceLink.classList.remove("hidden");
+      noSourceText.classList.add("hidden");
+      console.log("Source link set:", actualCategoryData.source);
+    } else {
+      sourceLink.classList.add("hidden");
+      noSourceText.classList.remove("hidden");
+      console.log("No source data available");
+    }
   } else {
-    sourceLink.classList.add("hidden");
-    noSourceText.classList.remove("hidden");
+    console.error("Source link elements not found in DOM");
   }
 
   // Update page title
   document.title = `${website} - Environmental Impact Details - Terravue`;
+}
+
+// Set fallback icon using website favicon
+function setFallbackIcon(iconElement, website) {
+  // Clean the website URL (remove protocol if present)
+  const cleanDomain = website.replace(/^https?:\/\//, "").replace(/^www\./, "");
+
+  // Try Google's favicon service first (most reliable)
+  const googleFaviconUrl = `https://www.google.com/s2/favicons?domain=${cleanDomain}&sz=64`;
+
+  console.log(
+    `Attempting to load favicon for ${website} from: ${googleFaviconUrl}`,
+  );
+
+  // Set the favicon URL
+  iconElement.src = googleFaviconUrl;
+  iconElement.alt = `${website} favicon`;
+
+  // Add error handling for favicon loading
+  iconElement.onerror = function () {
+    console.warn(`Google favicon failed for ${website}, trying alternative`);
+    tryAlternativeFavicon(iconElement, cleanDomain, website);
+  };
+
+  iconElement.onload = function () {
+    console.log(`Favicon loaded successfully for ${website}`);
+  };
+}
+
+// Try alternative favicon services if Google fails
+function tryAlternativeFavicon(iconElement, cleanDomain, website) {
+  // Try DuckDuckGo's favicon service as backup
+  const duckDuckGoFaviconUrl = `https://icons.duckduckgo.com/ip3/${cleanDomain}.ico`;
+
+  console.log(
+    `Trying DuckDuckGo favicon for ${website}: ${duckDuckGoFaviconUrl}`,
+  );
+
+  iconElement.src = duckDuckGoFaviconUrl;
+
+  iconElement.onerror = function () {
+    console.warn(
+      `DuckDuckGo favicon failed for ${website}, using letter fallback`,
+    );
+    useLetterFallback(iconElement, website);
+  };
+
+  iconElement.onload = function () {
+    console.log(`DuckDuckGo favicon loaded successfully for ${website}`);
+  };
+}
+
+// Final fallback: letter-based icon
+function useLetterFallback(iconElement, website) {
+  console.log(`Using letter fallback for ${website}`);
+
+  const firstLetter = website.charAt(0).toUpperCase();
+
+  // Create an SVG with the first letter
+  const letterSvg = `
+    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="12" fill="#10B981"/>
+      <text x="32" y="40" font-family="Inter, Arial, sans-serif" font-size="28" font-weight="bold" 
+            text-anchor="middle" fill="white">${firstLetter}</text>
+    </svg>
+  `;
+
+  // Convert SVG to base64 data URL
+  const svgBase64 = btoa(letterSvg);
+  const dataUrl = `data:image/svg+xml;base64,${svgBase64}`;
+
+  iconElement.src = dataUrl;
+  iconElement.alt = `${website} letter icon`;
+  iconElement.onerror = null; // Remove error handler to prevent infinite loop
 }
 
 // Visit website
