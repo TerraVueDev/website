@@ -1,255 +1,355 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <link rel="icon" href="/assets/img/terravue-nobg.png" type="image/x-icon" />
+    <title>Details - Terravue</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-  <link rel="icon" href="/assets/img/terravue-nobg.png" type="image/x-icon" />
-  <title>Details - Terravue</title>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+    <link rel="stylesheet" href="/assets/css/output.css" />
+    <link rel="stylesheet" href="/assets/css/app.css" />
+  </head>
 
-    body {
-      font-family: "Inter", sans-serif;
-    }
-  </style>
-  <link rel="stylesheet" href="/assets/css/output.css" />
-  <link rel="stylesheet" href="/assets/css/app.css">
-
-
-</head>
-
-<body class="bg-gray-50 min-h-screen">
-  <!-- Header -->
-  <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Top bar with logo and hamburger -->
-      <div class="flex justify-between items-center py-4">
-        <a href="/index.html">
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-3">
-              <img src="/assets/img/terravue.png" alt="Terravue logo" />
+  <body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between py-4">
+          <a href="/index.html">
+            <div class="flex items-center">
+              <div
+                class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-600"
+              >
+                <img src="/assets/img/terravue.png" alt="Terravue logo" />
+              </div>
+              <span class="text-xl font-semibold text-gray-900">Terravue</span>
             </div>
-            <span class="text-xl font-semibold text-gray-900">Terravue</span>
-          </div>
-        </a>
+          </a>
 
-        <!-- Hamburger Button -->
-        <button id="menu-toggle" class="md:hidden text-gray-800 text-2xl focus:outline-none">
-          <i class="fas fa-bars"></i>
-        </button>
+          <!-- Hamburger Button -->
+          <button
+            id="menu-toggle"
+            class="text-2xl text-gray-800 focus:outline-none md:hidden"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
 
-        <!-- Desktop Menu -->
-        <nav class="hidden md:flex space-x-8">
-          <a href="/index.html" class="text-gray-700 hover:text-green-600 font-medium">Home</a>
-          <a href="/src/search.html" class="text-gray-700 hover:text-green-600 font-medium">Search</a>
-          <a href="/src/contributor.html" class="text-gray-700 hover:text-green-600 font-medium">Contributor</a>
-        </nav>
-      </div>
-
-      <!-- Mobile Accordion Menu (below top bar) -->
-      <div id="mobile-menu" class="hidden md:hidden flex-col space-y-2 pb-4">
-        <a href="/index.html" class="block text-green-600 font-medium mr-0">Home</a>
-        <a href="/src/search.html" class="block text-gray-700 hover:text-green-600 font-medium">Search</a>
-        <a href="/src/contributor.html" class="block text-gray-700 hover:text-green-600 font-medium">Contributor</a>
-      </div>
-    </div>
-  </header>
-
-  <main class="mt-8 mb-8 min-h-screen">
-    <div class="max-w-4xl mx-auto px-4">
-      <!-- Back Button -->
-      <div class="mb-6">
-        <button onclick="goBack()" class="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-          </svg>
-          Back to Search
-        </button>
-      </div>
-
-      <!-- Loading State -->
-      <div id="loadingState" class="text-center py-12">
-        <div class="loading-spinner inline-block w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full">
-        </div>
-        <p class="mt-4 text-gray-600">Loading environmental data...</p>
-      </div>
-
-      <!-- Error State -->
-      <div id="errorState" class="hidden text-center py-12">
-        <div class="text-red-500 text-6xl mb-4">⚠️</div>
-        <h3 class="text-xl font-semibold text-gray-900 mb-2">
-          Failed to Load Data
-        </h3>
-        <p class="text-gray-600 mb-4">
-          Unable to fetch environmental impact data. Please try again later.
-        </p>
-        <button onclick="loadData()"
-          class="bg-green-600 text-white px-6 py-2 rounded-full hover:bg-green-600 transition-colors">
-          Retry
-        </button>
-      </div>
-
-      <!-- Details Content -->
-      <div id="detailsContent" class="hidden fade-in">
-        <!-- Header Section -->
-        <div class="bg-white rounded-2xl shadow-lg px-8 py-4 mb-8">
-          <div class="flex items-center space-x-6 mb-6">
-            <div class="w-16 h-16 bg-gray-100 rounded-full overflow-hidden flex items-center justify-center">
-              <img id="websiteIcon" alt="Website Logo" class="w-12 h-12 object-contain" />
-            </div>
-            <div class="flex-1">
-              <h1 id="websiteTitle" class="text-3xl font-bold text-gray-900 mb-2"></h1>
-              <p id="websiteCategory" class="text-lg text-gray-600 mb-4"></p>
-              <div id="impactBadge" class="text-lg"></div>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="flex space-x-4">
-            <button onclick="visitWebsite()" id="visitWebsiteBtn"
-              class="bg-green-600 text-white px-6 py-3 rounded-full hover:bg-green-600 transition-colors font-medium flex items-center">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-              Visit Website
-            </button>
-            <button onclick="shareLink()"
-              class="bg-blue-500 text-white px-6 py-3 rounded-full hover:bg-blue-600 transition-colors font-medium flex items-center">
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z">
-                </path>
-              </svg>
-              Share
-            </button>
-          </div>
+          <!-- Desktop Menu -->
+          <nav class="hidden space-x-8 md:flex">
+            <a
+              href="/index.html"
+              class="font-medium text-gray-700 hover:text-green-600"
+              >Home</a
+            >
+            <a
+              href="/src/search.html"
+              class="font-medium text-gray-700 hover:text-green-600"
+              >Search</a
+            >
+            <a
+              href="/src/contributor.html"
+              class="font-medium text-gray-700 hover:text-green-600"
+              >Contributor</a
+            >
+          </nav>
         </div>
 
-        <!-- Description Section -->
-        <div class="bg-white rounded-2xl shadow-lg px-8 py-4 mb-8">
-          <h2 class="text-2xl font-bold text-gray-900 mb-4">
-            Environmental Impact Overview
-          </h2>
-          <p id="websiteDescription" class="text-gray-700 leading-relaxed text-lg"></p>
+        <!-- Mobile Accordion Menu -->
+        <div id="mobile-menu" class="hidden flex-col space-y-2 pb-4 md:hidden">
+          <a href="/index.html" class="mr-0 block font-medium text-green-600"
+            >Home</a
+          >
+          <a
+            href="/src/search.html"
+            class="block font-medium text-gray-700 hover:text-green-600"
+            >Search</a
+          >
+          <a
+            href="/src/contributor.html"
+            class="block font-medium text-gray-700 hover:text-green-600"
+            >Contributor</a
+          >
+        </div>
+      </div>
+    </header>
+
+    <main class="mt-8 mb-8 min-h-screen">
+      <div class="mx-auto max-w-4xl px-4">
+        <!-- Back Button -->
+        <div class="mb-6">
+          <button
+            onclick="goBack()"
+            class="inline-flex items-center text-gray-600 transition-colors hover:text-gray-900"
+          >
+            <svg
+              class="mr-2 h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              ></path>
+            </svg>
+            Back to Search
+          </button>
         </div>
 
-        <!-- Annual Estimates Section -->
-        <div id="estimatesSection" class="space-y-6 mb-8">
-          <!-- Energy Consumption -->
-          <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div class="bg-blue-500 text-white p-3">
-              <h3 class="text-lg font-bold flex items-center">
-                <span class="mr-3"><i class="fa-solid fa-bolt"></i></span>
-                Annual Energy Consumption
-              </h3>
+        <!-- Loading State -->
+        <div id="loadingState" class="py-12 text-center">
+          <div
+            class="loading-spinner inline-block h-8 w-8 rounded-full border-4 border-green-200 border-t-green-600"
+          ></div>
+          <p class="mt-4 text-gray-600">Loading environmental data...</p>
+        </div>
+
+        <!-- Error State -->
+        <div id="errorState" class="hidden py-12 text-center">
+          <div class="mb-4 text-6xl text-red-500">⚠️</div>
+          <h3 class="mb-2 text-xl font-semibold text-gray-900">
+            Failed to Load Data
+          </h3>
+          <p class="mb-4 text-gray-600">
+            Unable to fetch environmental impact data. Please try again later.
+          </p>
+          <button
+            onclick="loadData()"
+            class="rounded-full bg-green-600 px-6 py-2 text-white transition-colors hover:bg-green-600"
+          >
+            Retry
+          </button>
+        </div>
+
+        <!-- Details Content -->
+        <div id="detailsContent" class="fade-in hidden">
+          <!-- Header Section -->
+          <div class="mb-8 rounded-2xl bg-white px-8 py-4 shadow-lg">
+            <div class="mb-6 flex items-center space-x-6">
+              <div
+                class="flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-gray-100"
+              >
+                <img
+                  id="websiteIcon"
+                  alt="Website Logo"
+                  class="h-12 w-12 object-contain"
+                />
+              </div>
+              <div class="flex-1">
+                <h1
+                  id="websiteTitle"
+                  class="mb-2 text-3xl font-bold text-gray-900"
+                ></h1>
+                <p id="websiteCategory" class="mb-4 text-lg text-gray-600"></p>
+                <div id="impactBadge" class="text-lg"></div>
+              </div>
             </div>
-            <div class="p-8 pb-0">
-              <div class="mb-6">
-                <div class="flex items-end space-x-2 mb-2">
-                  <span id="energyAmount" class="text-2xl font-bold text-blue-700"></span>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-4">
+              <button
+                onclick="visitWebsite()"
+                id="visitWebsiteBtn"
+                class="flex items-center rounded-full bg-green-600 px-6 py-3 font-medium text-white transition-colors hover:bg-green-600"
+              >
+                <svg
+                  class="mr-2 h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                  ></path>
+                </svg>
+                Visit Website
+              </button>
+              <button
+                onclick="shareLink()"
+                class="flex items-center rounded-full bg-blue-500 px-6 py-3 font-medium text-white transition-colors hover:bg-blue-600"
+              >
+                <svg
+                  class="mr-2 h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                  ></path>
+                </svg>
+                Share
+              </button>
+            </div>
+          </div>
+
+          <!-- Description Section -->
+          <div class="mb-8 rounded-2xl bg-white px-8 py-4 shadow-lg">
+            <h2 class="mb-4 text-2xl font-bold text-gray-900">
+              Environmental Impact Overview
+            </h2>
+            <p
+              id="websiteDescription"
+              class="text-lg leading-relaxed text-gray-700"
+            ></p>
+          </div>
+
+          <!-- Annual Estimates Section -->
+          <div id="estimatesSection" class="mb-8 space-y-6">
+            <!-- Energy Consumption -->
+            <div class="overflow-hidden rounded-2xl bg-white shadow-lg">
+              <div class="bg-blue-500 p-3 text-white">
+                <h3 class="flex items-center text-lg font-bold">
+                  <span class="mr-3"><i class="fa-solid fa-bolt"></i></span>
+                  Annual Energy Consumption
+                </h3>
+              </div>
+              <div class="p-8 pb-0">
+                <div class="mb-6">
+                  <div class="mb-2 flex items-end space-x-2">
+                    <span
+                      id="energyAmount"
+                      class="text-2xl font-bold text-blue-700"
+                    ></span>
+                  </div>
+                  <div class="rounded-lg bg-blue-100 p-4">
+                    <p
+                      id="energyComparison"
+                      class="font-medium text-blue-800"
+                    ></p>
+                  </div>
                 </div>
-                <div class="bg-blue-100 rounded-lg p-4">
-                  <p id="energyComparison" class="text-blue-800 font-medium"></p>
+              </div>
+            </div>
+
+            <!-- Carbon Emissions -->
+            <div class="overflow-hidden rounded-2xl bg-white shadow-lg">
+              <div class="bg-red-800 p-3 text-white">
+                <h3 class="flex items-center text-lg font-bold">
+                  <span class="mr-3"><i class="fa-solid fa-industry"></i></span>
+                  Annual Carbon Emissions
+                </h3>
+              </div>
+              <div class="p-8 pb-0">
+                <div class="mb-6">
+                  <div class="mb-2 flex items-end space-x-2">
+                    <span
+                      id="co2Amount"
+                      class="text-2xl font-bold text-red-700"
+                    ></span>
+                  </div>
+                  <div class="rounded-lg bg-red-100 p-4">
+                    <p id="co2Comparison" class="font-medium text-red-800"></p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Carbon Emissions -->
-          <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div class="bg-red-800 text-white p-3">
-              <h3 class="text-lg font-bold flex items-center">
-                <span class="mr-3"><i class="fa-solid fa-industry"></i></span>
-                Annual Carbon Emissions
+          <!-- No Data Message -->
+          <div
+            id="noDataMessage"
+            class="mb-8 hidden rounded-2xl bg-white p-8 shadow-lg"
+          >
+            <div class="text-center">
+              <div class="mb-4 text-6xl text-gray-400">📊</div>
+              <h3 class="mb-2 text-xl font-semibold text-gray-900">
+                Detailed Impact Data Not Available
               </h3>
-            </div>
-            <div class="p-8 pb-0">
-              <div class="mb-6">
-                <div class="flex items-end space-x-2 mb-2">
-                  <span id="co2Amount" class="text-2xl font-bold text-red-700"></span>
-                </div>
-                <div class="bg-red-100 rounded-lg p-4">
-                  <p id="co2Comparison" class="text-red-800 font-medium"></p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- No Data Message -->
-        <div id="noDataMessage" class="hidden bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div class="text-center">
-            <div class="text-gray-400 text-6xl mb-4">📊</div>
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
-              Detailed Impact Data Not Available
-            </h3>
-            <p class="text-gray-600">
-              Annual energy consumption and carbon emission estimates are not
-              available for this service yet.
-            </p>
-          </div>
-        </div>
-
-        <!-- Source Information -->
-        <div class="bg-white rounded-2xl shadow-lg p-8 pb-4">
-          <h3 class="text-lg font-bold text-gray-900 mb-4">Data Source</h3>
-          <div class="flex items-center space-x-3">
-            <span class="text-2xl">📊</span>
-            <div>
-              <a id="sourceLink" href="#" target="_blank"
-                class="text-blue-600 hover:text-blue-800 underline font-medium text-sm"></a>
-              <p id="noSourceText" class="text-gray-600 hidden">
-                Source information not available
+              <p class="text-gray-600">
+                Annual energy consumption and carbon emission estimates are not
+                available for this service yet.
               </p>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </main>
 
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-gray-300 py-12 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col gap-6 md:flex-row md:justify-between md:items-center">
-        <!-- Logo -->
-        <div class="flex justify-center">
-          <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-3">
-            <img class="rounded-lg" src="/assets/img/terravue.png" alt="Terravue logo" />
+          <!-- Source Information -->
+          <div class="rounded-2xl bg-white p-8 pb-4 shadow-lg">
+            <h3 class="mb-4 text-lg font-bold text-gray-900">Data Source</h3>
+            <div class="flex items-center space-x-3">
+              <span class="text-2xl">📊</span>
+              <div>
+                <a
+                  id="sourceLink"
+                  href="#"
+                  target="_blank"
+                  class="text-sm font-medium text-blue-600 underline hover:text-blue-800"
+                ></a>
+                <p id="noSourceText" class="hidden text-gray-600">
+                  Source information not available
+                </p>
+              </div>
+            </div>
           </div>
-          <span class="text-xl font-semibold text-white">Terravue</span>
-        </div>
-
-        <!-- Tagline -->
-        <div class="text-sm text-center md:text-left">
-          Building a sustainable future through digital education.
-        </div>
-
-        <!-- Links -->
-        <div class="flex justify-center md:justify-end space-x-6">
-          <a href="#" class="hover:text-white transition-colors mr-0">Support</a>
         </div>
       </div>
-    </div>
-  </footer>
-  <script>
-    const toggleBtn = document.getElementById("menu-toggle");
-    const mobileMenu = document.getElementById("mobile-menu");
+    </main>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const website = urlParams.get("website");
+    <!-- Footer -->
+    <footer class="mt-auto bg-gray-900 py-12 text-gray-300">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+          class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between"
+        >
+          <!-- Logo -->
+          <div class="flex justify-center">
+            <div
+              class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-600"
+            >
+              <img
+                class="rounded-lg"
+                src="/assets/img/terravue.png"
+                alt="Terravue logo"
+              />
+            </div>
+            <span class="text-xl font-semibold text-white">Terravue</span>
+          </div>
 
-    // Set title and other fields as usual...
-    document.getElementById("websiteTitle").textContent = website;
+          <!-- Tagline -->
+          <div class="text-center text-sm md:text-left">
+            Building a sustainable future through digital education.
+          </div>
 
-    toggleBtn.addEventListener("click", () => {
-      mobileMenu.classList.toggle("hidden");
-    });
-  </script>
-  <script src="details.js"></script>
-</body>
+          <!-- Links -->
+          <div class="flex justify-center space-x-6 md:justify-end">
+            <a href="#" class="mr-0 transition-colors hover:text-white"
+              >Support</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script>
+      const toggleBtn = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const website = urlParams.get("website");
+
+      document.getElementById("websiteTitle").textContent = website;
+
+      toggleBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+    </script>
+    <script src="details.js"></script>
+  </body>
 </html>

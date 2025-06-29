@@ -1,11 +1,9 @@
 let allData = {};
 let filteredResults = [];
 
-// Cache configuration
 const CACHE_KEY = "terraVueData";
-const CACHE_DURATION = 30 * 60 * 1000; // 30 minutes in milliseconds
+const CACHE_DURATION = 30 * 60 * 1000;
 
-// Cache utility functions
 function getCachedData() {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
@@ -14,23 +12,18 @@ function getCachedData() {
     const { data, timestamp } = JSON.parse(cached);
     const now = Date.now();
 
-    // Check if cache is still valid
     if (now - timestamp > CACHE_DURATION) {
-      console.log("Cache expired, removing...");
       localStorage.removeItem(CACHE_KEY);
       return null;
     }
 
-    // Check if cached data is actually valid (not empty)
     if (!data || Object.keys(data).length === 0) {
-      console.log("Cache contains no data, removing...");
       localStorage.removeItem(CACHE_KEY);
       return null;
     }
 
     return data;
   } catch (error) {
-    console.warn("Error reading from cache:", error);
     localStorage.removeItem(CACHE_KEY);
     return null;
   }
@@ -48,7 +41,6 @@ function setCachedData(data) {
   }
 }
 
-// Get impact badge HTML
 function getImpactBadge(impact) {
   const badges = {
     high: '<span class="impact-badge inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800">🔴 High Impact</span>',
@@ -61,7 +53,6 @@ function getImpactBadge(impact) {
   return badges[impact] || badges.unknown;
 }
 
-// Format category name for display
 function formatCategoryName(categoryKey) {
   return categoryKey
     .split("_")
@@ -69,33 +60,27 @@ function formatCategoryName(categoryKey) {
     .join(" ");
 }
 
-// Replace your loadData function with this fixed version
 async function loadData() {
   try {
-    // Check cache first
     const cachedData = getCachedData();
     if (cachedData) {
       allData = cachedData;
       console.log(
         "Data loaded from cache:",
         Object.keys(allData).length,
-        "websites"
+        "websites",
       );
       return;
     }
 
-    // Clear any existing bad cache
     localStorage.removeItem(CACHE_KEY);
 
-    console.log("🔍 Starting data fetch...");
-
-    // Fetch both files
     const [linksResponse, categoriesResponse] = await Promise.all([
       fetch(
-        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/links.json"
+        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/links.json",
       ),
       fetch(
-        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/categories.json"
+        "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/categories.json",
       ),
     ]);
 
@@ -104,7 +89,7 @@ async function loadData() {
     }
     if (!categoriesResponse.ok) {
       throw new Error(
-        `Failed to fetch categories: ${categoriesResponse.status}`
+        `Failed to fetch categories: ${categoriesResponse.status}`,
       );
     }
 
@@ -113,7 +98,6 @@ async function loadData() {
       categoriesResponse.json(),
     ]);
 
-    // Process data and extract impact information
     allData = {};
     let processedCount = 0;
     let impactStats = { high: 0, medium: 0, low: 0, unknown: 0 };
@@ -121,58 +105,39 @@ async function loadData() {
     for (const [website, linkData] of Object.entries(linksData)) {
       processedCount++;
 
-      // Get category key
       const categoryKey = linkData.categories || linkData.category || "unknown";
 
-      // Get category info
       const categoryInfo = categoriesData[categoryKey] || {};
 
-      // Extract impact - this is the key fix!
       let impact = "unknown";
       if (categoryInfo.impact) {
         impact = categoryInfo.impact.toLowerCase();
-        // Validate impact value
         if (!["high", "medium", "low"].includes(impact)) {
           impact = "unknown";
         }
       }
 
-      // Update stats
       impactStats[impact]++;
 
-      // Create the data structure with correct impact
       allData[website] = {
         category: categoryKey,
         icon: linkData.icon || "default",
-        impact: impact, // ← Now using the actual impact value!
+        impact: impact,
         description:
           linkData.description ||
           categoryInfo.description ||
           `${formatCategoryName(categoryKey)} website`,
-        // Optional: include additional category data
         categoryData: categoryInfo,
       };
     }
 
-    // Log statistics
-    console.log("✅ Data processing complete!");
-    console.log("📊 Impact distribution:", impactStats);
-    console.log("🌐 Total websites processed:", processedCount);
-
-    // Cache the processed data
     setCachedData(allData);
-    console.log(
-      "Data loaded successfully:",
-      Object.keys(allData).length,
-      "websites"
-    );
   } catch (error) {
     console.error("Error loading data:", error);
     showErrorMessage(`Failed to load data: ${error.message}`);
   }
 }
 
-// Show error message to user
 function showErrorMessage(message) {
   const container = document.getElementById("resultsContainer");
   const grid = document.getElementById("resultsGrid");
@@ -183,7 +148,6 @@ function showErrorMessage(message) {
   container.classList.add("hidden");
   popularSearches.classList.add("hidden");
 
-  // Show error in no results section
   noResults.innerHTML = `
     <div class="text-center py-12">
       <div class="text-6xl mb-4">⚠️</div>
@@ -197,77 +161,46 @@ function showErrorMessage(message) {
   noResults.classList.remove("hidden");
 }
 
-// Perform search
 function performSearch(query) {
-  console.log("Performing search for:", query);
-  console.log("Total data available:", Object.keys(allData).length);
-
   if (!query.trim()) {
     showPopularSearches();
     return;
   }
 
-  // Check if data is loaded
   if (Object.keys(allData).length === 0) {
-    console.warn("No data available for search");
     showErrorMessage(
-      "No data loaded. Please check your internet connection and reload the page."
+      "No data loaded. Please check your internet connection and reload the page.",
     );
     return;
   }
 
   showLoading();
 
-  // Simulate slight delay for better UX
   setTimeout(() => {
     const results = searchData(query.toLowerCase());
-    console.log("Search results:", results.length, "found");
     displayResults(results, query);
   }, 500);
 }
 
-// Search through the data
 function searchData(query) {
-  console.log("Searching for:", query);
   const results = [];
 
   for (const [website, data] of Object.entries(allData)) {
     let score = 0;
 
-    // Debug: log what we're checking
-    console.log(`Checking ${website}:`, {
-      category: data.category,
-      description: data.description,
-      icon: data.icon,
-    });
-
-    // Exact match gets highest score
     if (website.toLowerCase() === query) {
       score += 100;
-      console.log(`Exact match found: ${website}`);
-    }
-    // Website name contains query
-    else if (website.toLowerCase().includes(query)) {
+    } else if (website.toLowerCase().includes(query)) {
       score += 50;
-      console.log(`Partial match found: ${website}`);
-    }
-    // Category name contains query
-    else if (data.category && data.category.toLowerCase().includes(query)) {
+    } else if (data.category && data.category.toLowerCase().includes(query)) {
       score += 30;
-      console.log(`Category match found: ${website} (${data.category})`);
-    }
-    // Description contains query (if available)
-    else if (
+    } else if (
       data.description &&
       data.description.toLowerCase().includes(query)
     ) {
       score += 20;
-      console.log(`Description match found: ${website}`);
-    }
-    // Icon name contains query
-    else if (data.icon && data.icon.toLowerCase().includes(query)) {
+    } else if (data.icon && data.icon.toLowerCase().includes(query)) {
       score += 15;
-      console.log(`Icon match found: ${website} (${data.icon})`);
     }
 
     if (score > 0) {
@@ -279,12 +212,9 @@ function searchData(query) {
     }
   }
 
-  console.log("Search completed. Results:", results.length);
-  // Sort by score (relevance)
   return results.sort((a, b) => b.score - a.score);
 }
 
-// Display search results
 function displayResults(results, query) {
   const container = document.getElementById("resultsContainer");
   const grid = document.getElementById("resultsGrid");
@@ -307,46 +237,38 @@ function displayResults(results, query) {
   // Update result count and title
   if (query) {
     resultCount.textContent = `(${results.length})`;
-    document.querySelector(
-      "#resultsContainer h2"
-    ).innerHTML = `Search Results <span id="resultCount" class="text-green-600">(${results.length})</span>`;
+    document.querySelector("#resultsContainer h2").innerHTML =
+      `Search Results <span id="resultCount" class="text-green-600">(${results.length})</span>`;
   } else {
     resultCount.textContent = `(${results.length})`;
-    document.querySelector(
-      "#resultsContainer h2"
-    ).innerHTML = `All Websites <span id="resultCount" class="text-green-600">(${results.length})</span>`;
+    document.querySelector("#resultsContainer h2").innerHTML =
+      `All Websites <span id="resultCount" class="text-green-600">(${results.length})</span>`;
   }
 
-  // Clear previous results
   grid.innerHTML = "";
 
-  // Create result cards
   results.forEach((result) => {
     const card = createResultCard(result);
     grid.appendChild(card);
   });
 
-  // Show results
   container.classList.remove("hidden");
   noResults.classList.add("hidden");
   popularSearches.classList.add("hidden");
 
-  // Trigger fade-in animation
   setTimeout(() => {
     container.classList.add("fade-in");
   }, 50);
 }
 
-// Create result card
 function createResultCard(result) {
   const card = document.createElement("div");
   card.className =
     "result-card bg-white rounded-2xl shadow-lg p-6 border border-gray-100 flex flex-col";
 
-  // Add click handler to navigate to details page
   card.addEventListener("click", () => {
     window.location.href = `details.html?website=${encodeURIComponent(
-      result.website
+      result.website,
     )}`;
   });
 
@@ -357,7 +279,7 @@ function createResultCard(result) {
                 result.website
               }</h3>
               <p class="text-gray-600 text-sm">${formatCategoryName(
-                result.category
+                result.category,
               )}</p>
             </div>
           </div>
@@ -376,7 +298,6 @@ function createResultCard(result) {
   return card;
 }
 
-// Show loading state
 function showLoading() {
   document.getElementById("loadingState").classList.remove("hidden");
   document.getElementById("resultsContainer").classList.add("hidden");
@@ -384,12 +305,10 @@ function showLoading() {
   document.getElementById("popularSearches").classList.add("hidden");
 }
 
-// Hide loading state
 function hideLoading() {
   document.getElementById("loadingState").classList.add("hidden");
 }
 
-// Show popular searches
 function showPopularSearches() {
   document.getElementById("resultsContainer").classList.add("hidden");
   document.getElementById("noResults").classList.add("hidden");
@@ -397,13 +316,7 @@ function showPopularSearches() {
   hideLoading();
 }
 
-// Display all links by default
 function displayAllLinks() {
-  console.log(
-    "Displaying all links. Data available:",
-    Object.keys(allData).length
-  );
-
   if (Object.keys(allData).length === 0) {
     console.warn("No data to display");
     showErrorMessage("No websites loaded. Please check your data source.");
@@ -412,18 +325,15 @@ function displayAllLinks() {
 
   const allResults = Object.entries(allData).map(([website, data]) => ({
     website,
-    score: 0, // Default score for sorting
+    score: 0,
     ...data,
   }));
 
-  // Sort alphabetically by default
   allResults.sort((a, b) => a.website.localeCompare(b.website));
 
-  console.log("Displaying", allResults.length, "websites");
   displayResults(allResults, "");
 }
 
-// Generate search suggestions
 function generateSuggestions(query) {
   if (!query.trim()) return [];
 
@@ -439,7 +349,6 @@ function generateSuggestions(query) {
   return suggestions;
 }
 
-// Show search suggestions
 function showSuggestions(suggestions) {
   const container = document.getElementById("searchSuggestions");
 
@@ -451,19 +360,17 @@ function showSuggestions(suggestions) {
   container.innerHTML = suggestions
     .map(
       (suggestion) =>
-        `<div class="suggestion-item" data-suggestion="${suggestion}">${suggestion}</div>`
+        `<div class="suggestion-item" data-suggestion="${suggestion}">${suggestion}</div>`,
     )
     .join("");
 
   container.classList.remove("hidden");
 }
 
-// Hide search suggestions
 function hideSuggestions() {
   document.getElementById("searchSuggestions").classList.add("hidden");
 }
 
-// Sort results
 function sortResults(sortBy) {
   if (!filteredResults.length) return;
 
@@ -488,11 +395,10 @@ function sortResults(sortBy) {
     case "category":
       sortedResults.sort((a, b) => a.category.localeCompare(b.category));
       break;
-    default: // relevance
+    default:
       sortedResults.sort((a, b) => b.score - a.score);
   }
 
-  // Re-render results
   const grid = document.getElementById("resultsGrid");
   grid.innerHTML = "";
   sortedResults.forEach((result) => {
@@ -501,10 +407,7 @@ function sortResults(sortBy) {
   });
 }
 
-// Event listeners
 document.addEventListener("DOMContentLoaded", async () => {
-  // Clear cache button for debugging (you can remove this later)
-  console.log("Adding debug clear cache function to window");
   window.clearCache = function () {
     localStorage.removeItem(CACHE_KEY);
     console.log("Cache cleared! Reloading...");
@@ -517,7 +420,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const searchButton = document.getElementById("searchButton");
   const sortSelect = document.getElementById("sortSelect");
 
-  // Search functionality
   searchButton.addEventListener("click", () => {
     performSearch(searchInput.value);
   });
@@ -529,13 +431,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Search suggestions
   searchInput.addEventListener("input", (e) => {
     const suggestions = generateSuggestions(e.target.value);
     showSuggestions(suggestions);
   });
 
-  // Handle suggestion clicks
   document.addEventListener("click", (e) => {
     if (e.target.classList.contains("suggestion-item")) {
       const suggestion = e.target.dataset.suggestion;
@@ -547,14 +447,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Sort functionality
   if (sortSelect) {
     sortSelect.addEventListener("change", (e) => {
       sortResults(e.target.value);
     });
   }
 
-  // Popular search buttons
   document.addEventListener("click", (e) => {
     if (e.target.classList.contains("popular-search-btn")) {
       const searchTerm = e.target.dataset.search;
@@ -563,11 +461,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   });
 
-  // Show popular searches initially if no data
   if (Object.keys(allData).length === 0) {
     showPopularSearches();
   } else {
-    // Initialize by showing all links
     displayAllLinks();
   }
 });

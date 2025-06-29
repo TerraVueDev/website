@@ -1,212 +1,277 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <link rel="icon" href="/assets/img/terravue-nobg.png" type="image/x-icon" />
+    <title>Search - Terravue</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
-  <link rel="icon" href="/assets/img/terravue-nobg.png" type="image/x-icon" />
-  <title>Search - Terravue</title>
-  <style>
-    @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+      body {
+        font-family: "Inter", sans-serif;
+      }
+    </style>
+    <link rel="stylesheet" href="/assets/css/output.css" />
+    <link rel="stylesheet" href="/assets/css/app.css" />
+  </head>
 
-    body {
-      font-family: "Inter", sans-serif;
-    }
-  </style>
-  <link rel="stylesheet" href="/assets/css/output.css" />
-  <link rel="stylesheet" href="/assets/css/app.css">
-
-</head>
-
-<body class="bg-gray-50 min-h-screen">
-  <!-- Header -->
-  <header class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <!-- Top bar with logo and hamburger -->
-      <div class="flex justify-between items-center py-4">
-        <a href="/index.html">
-          <div class="flex items-center">
-            <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-3">
-              <img src="/assets/img/terravue.png" alt="Terravue logo" />
+  <body class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between py-4">
+          <a href="/index.html">
+            <div class="flex items-center">
+              <div
+                class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-600"
+              >
+                <img src="/assets/img/terravue.png" alt="Terravue logo" />
+              </div>
+              <span class="text-xl font-semibold text-gray-900">Terravue</span>
             </div>
-            <span class="text-xl font-semibold text-gray-900">Terravue</span>
-          </div>
-        </a>
+          </a>
 
-        <!-- Hamburger Button -->
-        <button id="menu-toggle" class="md:hidden text-gray-800 text-2xl focus:outline-none">
-          <i class="fas fa-bars"></i>
-        </button>
-
-        <!-- Desktop Menu -->
-        <nav class="hidden md:flex space-x-8">
-          <a href="/index.html" class="text-gray-700 hover:text-green-600 font-medium ">Home</a>
-          <a href="/src/search.html" class="text-green-600 border-b-2 border-green-600 font-medium">Search</a>
-          <a href="/src/contributor.html" class="text-gray-700 hover:text-green-600 font-medium">Contributor</a>
-        </nav>
-      </div>
-
-      <!-- Mobile Accordion Menu (below top bar) -->
-      <div id="mobile-menu" class="hidden md:hidden flex-col space-y-2 pb-4">
-        <a href="/index.html" class="block text-gray-700 hover:text-green-600 font-medium">Home</a>
-        <a href="/src/search.html" class="block text-green-600 font-medium">Search</a>
-        <a href="/src/contributor.html" class="block text-gray-700 hover:text-green-600 font-medium">Contributor</a>
-      </div>
-    </div>
-  </header>
-
-  <!-- Hero Section -->
-  <section class="py-16 bg-gradient-to-br from-green-50 to-blue-50">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-        Search Environmental Impact
-      </h1>
-      <p class="text-xl text-gray-600 mb-8">
-        Discover the carbon footprint of your favorite websites and services
-      </p>
-
-      <!-- Search Container -->
-      <div class="search-container">
-        <div class="relative">
-          <input type="text" id="searchInput" placeholder="Enter website or service name..."
-            class="search-input w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-full focus:outline-none focus:border-green-600 bg-white"
-            autocomplete="off" />
-          <button id="searchButton"
-            class="absolute right-2 top-8 transform -translate-y-1/2 bg-green-600 text-white p-3 rounded-full hover:bg-green-600 transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
+          <!-- Hamburger Button -->
+          <button
+            id="menu-toggle"
+            class="text-2xl text-gray-800 focus:outline-none md:hidden"
+          >
+            <i class="fas fa-bars"></i>
           </button>
 
-          <!-- Search Suggestions -->
-          <div id="searchSuggestions" class="search-suggestions hidden"></div>
+          <!-- Desktop Menu -->
+          <nav class="hidden space-x-8 md:flex">
+            <a
+              href="/index.html"
+              class="font-medium text-gray-700 hover:text-green-600"
+              >Home</a
+            >
+            <a
+              href="/src/search.html"
+              class="border-b-2 border-green-600 font-medium text-green-600"
+              >Search</a
+            >
+            <a
+              href="/src/contributor.html"
+              class="font-medium text-gray-700 hover:text-green-600"
+              >Contributor</a
+            >
+          </nav>
+        </div>
+
+        <!-- Mobile Accordion Menu -->
+        <div id="mobile-menu" class="hidden flex-col space-y-2 pb-4 md:hidden">
+          <a
+            href="/index.html"
+            class="block font-medium text-gray-700 hover:text-green-600"
+            >Home</a
+          >
+          <a href="/src/search.html" class="block font-medium text-green-600"
+            >Search</a
+          >
+          <a
+            href="/src/contributor.html"
+            class="block font-medium text-gray-700 hover:text-green-600"
+            >Contributor</a
+          >
         </div>
       </div>
-    </div>
-  </section>
+    </header>
 
-  <!-- Main Content -->
-  <main class="py-12">
-    <div class="max-w-6xl mx-auto px-4">
-      <!-- Loading State -->
-      <div id="loadingState" class="hidden text-center py-12">
-        <div class="loading-spinner inline-block w-8 h-8 border-4 border-green-200 border-t-green-600 rounded-full">
-        </div>
-        <p class="mt-4 text-gray-600">Searching environmental data...</p>
-      </div>
-
-      <!-- No Results State -->
-      <div id="noResults" class="hidden text-center py-12">
-        <div class="text-gray-400 text-6xl mb-4">🔍</div>
-        <h3 class="text-2xl font-semibold text-gray-900 mb-2">
-          No Results Found
-        </h3>
-        <p class="text-gray-600 mb-6">
-          We couldn't find any environmental data for your search. Try a
-          different term or check our popular searches below.
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-br from-green-50 to-blue-50 py-16">
+      <div class="mx-auto max-w-4xl px-4 text-center">
+        <h1 class="mb-6 text-4xl font-bold text-gray-900 md:text-5xl">
+          Search Environmental Impact
+        </h1>
+        <p class="mb-8 text-xl text-gray-600">
+          Discover the carbon footprint of your favorite websites and services
         </p>
-      </div>
 
-      <!-- Results Container -->
-      <div id="resultsContainer" class="hidden">
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-8 sm:justify content-between">
-          <h2 class="text-2xl font-bold text-gray-900">
-            Search Results
-            <span id="resultCount" class="text-green-600"></span>
-          </h2>
-          <div class="flex items-center space-x-4">
-            <label class="text-gray-700 font-medium">Sort by:</label>
-            <div class="select-wrapper">
-              <select id="sortSelect"
-                class="border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-green-600 min-w-52">
-                <option value="relevance">Relevance</option>
-                <option value="impact-high">Impact (High to Low)</option>
-                <option value="impact-low">Impact (Low to High)</option>
-                <option value="alphabetical">Alphabetical</option>
-              </select>
+        <!-- Search Container -->
+        <div class="search-container">
+          <div class="relative">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Enter website or service name..."
+              class="search-input w-full rounded-full border-2 border-gray-200 bg-white px-6 py-4 text-lg focus:border-green-600 focus:outline-none"
+              autocomplete="off"
+            />
+            <button
+              id="searchButton"
+              class="absolute top-8 right-2 -translate-y-1/2 transform rounded-full bg-green-600 p-3 text-white transition-colors hover:bg-green-600"
+            >
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                ></path>
+              </svg>
+            </button>
+
+            <!-- Search Suggestions -->
+            <div id="searchSuggestions" class="search-suggestions hidden"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="py-12">
+      <div class="mx-auto max-w-6xl px-4">
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden py-12 text-center">
+          <div
+            class="loading-spinner inline-block h-8 w-8 rounded-full border-4 border-green-200 border-t-green-600"
+          ></div>
+          <p class="mt-4 text-gray-600">Searching environmental data...</p>
+        </div>
+
+        <!-- No Results State -->
+        <div id="noResults" class="hidden py-12 text-center">
+          <div class="mb-4 text-6xl text-gray-400">🔍</div>
+          <h3 class="mb-2 text-2xl font-semibold text-gray-900">
+            No Results Found
+          </h3>
+          <p class="mb-6 text-gray-600">
+            We couldn't find any environmental data for your search. Try a
+            different term or check our popular searches below.
+          </p>
+        </div>
+
+        <!-- Results Container -->
+        <div id="resultsContainer" class="hidden">
+          <div
+            class="sm:justify mb-8 flex flex-col content-between items-center justify-between sm:flex-row"
+          >
+            <h2 class="text-2xl font-bold text-gray-900">
+              Search Results
+              <span id="resultCount" class="text-green-600"></span>
+            </h2>
+            <div class="flex items-center space-x-4">
+              <label class="font-medium text-gray-700">Sort by:</label>
+              <div class="select-wrapper">
+                <select
+                  id="sortSelect"
+                  class="min-w-52 rounded-lg border border-gray-300 px-3 py-2 focus:border-green-600 focus:outline-none"
+                >
+                  <option value="relevance">Relevance</option>
+                  <option value="impact-high">Impact (High to Low)</option>
+                  <option value="impact-low">Impact (Low to High)</option>
+                  <option value="alphabetical">Alphabetical</option>
+                </select>
+              </div>
             </div>
           </div>
+
+          <div
+            id="resultsGrid"
+            class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3"
+          ></div>
         </div>
 
-        <div id="resultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </div>
-
-      <!-- Popular Searches -->
-      <div id="popularSearches" class="mt-16">
-        <h3 class="text-2xl font-bold text-gray-900 mb-8 text-center">
-          Popular Searches
-        </h3>
-        <div class="flex flex-wrap justify-center gap-3">
-          <button
-            class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-600 hover:text-green-600 transition-colors font-medium"
-            data-search="google.com">
-            Google
-          </button>
-          <button
-            class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-600 hover:text-green-600 transition-colors font-medium"
-            data-search="youtube.com">
-            YouTube
-          </button>
-          <button
-            class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-600 hover:text-green-600 transition-colors font-medium"
-            data-search="facebook.com">
-            Facebook
-          </button>
-          <button
-            class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-600 hover:text-green-600 transition-colors font-medium"
-            data-search="netflix.com">
-            Netflix
-          </button>
-          <button
-            class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-600 hover:text-green-600 transition-colors font-medium"
-            data-search="amazon.com">
-            Amazon
-          </button>
-          <button
-            class="popular-search-btn bg-white border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-full hover:border-green-600 hover:text-green-600 transition-colors font-medium"
-            data-search="twitter.com">
-            Twitter
-          </button>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Footer -->
-  <footer class="bg-gray-900 text-gray-300 py-12">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col gap-6 md:flex-row md:justify-between md:items-center">
-        <!-- Logo -->
-        <div class="flex justify-center">
-          <div class="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center mr-3">
-            <img class="rounded-lg" src="/assets/img/terravue.png" alt="Terravue logo" />
+        <!-- Popular Searches -->
+        <div id="popularSearches" class="mt-16">
+          <h3 class="mb-8 text-center text-2xl font-bold text-gray-900">
+            Popular Searches
+          </h3>
+          <div class="flex flex-wrap justify-center gap-3">
+            <button
+              class="popular-search-btn rounded-full border-2 border-gray-200 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:border-green-600 hover:text-green-600"
+              data-search="google.com"
+            >
+              Google
+            </button>
+            <button
+              class="popular-search-btn rounded-full border-2 border-gray-200 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:border-green-600 hover:text-green-600"
+              data-search="youtube.com"
+            >
+              YouTube
+            </button>
+            <button
+              class="popular-search-btn rounded-full border-2 border-gray-200 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:border-green-600 hover:text-green-600"
+              data-search="facebook.com"
+            >
+              Facebook
+            </button>
+            <button
+              class="popular-search-btn rounded-full border-2 border-gray-200 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:border-green-600 hover:text-green-600"
+              data-search="netflix.com"
+            >
+              Netflix
+            </button>
+            <button
+              class="popular-search-btn rounded-full border-2 border-gray-200 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:border-green-600 hover:text-green-600"
+              data-search="amazon.com"
+            >
+              Amazon
+            </button>
+            <button
+              class="popular-search-btn rounded-full border-2 border-gray-200 bg-white px-6 py-3 font-medium text-gray-700 transition-colors hover:border-green-600 hover:text-green-600"
+              data-search="twitter.com"
+            >
+              Twitter
+            </button>
           </div>
-          <span class="text-xl font-semibold text-white">Terravue</span>
-        </div>
-
-        <!-- Tagline -->
-        <div class="text-sm text-center md:text-left">
-          Building a sustainable future through digital education.
-        </div>
-
-        <!-- Links -->
-        <div class="flex justify-center md:justify-end space-x-6">
-          <a href="#" class="hover:text-white transition-colors mr-0">Support</a>
         </div>
       </div>
-    </div>
-  </footer>
-  <script>
-    const toggleBtn = document.getElementById("menu-toggle");
-    const mobileMenu = document.getElementById("mobile-menu");
+    </main>
 
-    toggleBtn.addEventListener("click", () => {
-      mobileMenu.classList.toggle("hidden");
-    });
-  </script>
-  <script src="search.js"></script>
-</body>
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-12 text-gray-300">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div
+          class="flex flex-col gap-6 md:flex-row md:items-center md:justify-between"
+        >
+          <!-- Logo -->
+          <div class="flex justify-center">
+            <div
+              class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-green-600"
+            >
+              <img
+                class="rounded-lg"
+                src="/assets/img/terravue.png"
+                alt="Terravue logo"
+              />
+            </div>
+            <span class="text-xl font-semibold text-white">Terravue</span>
+          </div>
 
+          <!-- Tagline -->
+          <div class="text-center text-sm md:text-left">
+            Building a sustainable future through digital education.
+          </div>
+
+          <!-- Links -->
+          <div class="flex justify-center space-x-6 md:justify-end">
+            <a href="#" class="mr-0 transition-colors hover:text-white"
+              >Support</a
+            >
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script>
+      const toggleBtn = document.getElementById("menu-toggle");
+      const mobileMenu = document.getElementById("mobile-menu");
+
+      toggleBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+    </script>
+    <script src="search.js"></script>
+  </body>
 </html>
