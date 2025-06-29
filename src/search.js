@@ -16,6 +16,14 @@ function getCachedData() {
 
     // Check if cache is still valid
     if (now - timestamp > CACHE_DURATION) {
+      console.log("Cache expired, removing...");
+      localStorage.removeItem(CACHE_KEY);
+      return null;
+    }
+
+    // Check if cached data is actually valid (not empty)
+    if (!data || Object.keys(data).length === 0) {
+      console.log("Cache contains no data, removing...");
       localStorage.removeItem(CACHE_KEY);
       return null;
     }
@@ -61,7 +69,7 @@ function formatCategoryName(categoryKey) {
     .join(" ");
 }
 
-// Load data from GitHub with caching
+// Replace your loadData function with this fixed version
 async function loadData() {
   try {
     // Check cache first
@@ -76,8 +84,12 @@ async function loadData() {
       return;
     }
 
-    // Fetch from API if no cache
-    console.log("Fetching fresh data from API...");
+    // Clear any existing bad cache
+    localStorage.removeItem(CACHE_KEY);
+
+    console.log("🔍 Starting data fetch...");
+
+    // Fetch both files
     const [linksResponse, categoriesResponse] = await Promise.all([
       fetch(
         "https://raw.githubusercontent.com/TerraVueDev/assets/refs/heads/main/links.json"
@@ -87,27 +99,68 @@ async function loadData() {
       ),
     ]);
 
-    if (!linksResponse.ok || !categoriesResponse.ok) {
-      throw new Error("Failed to fetch data");
+    if (!linksResponse.ok) {
+      throw new Error(`Failed to fetch links: ${linksResponse.status}`);
+    }
+    if (!categoriesResponse.ok) {
+      throw new Error(
+        `Failed to fetch categories: ${categoriesResponse.status}`
+      );
     }
 
-    const linksData = await linksResponse.json();
-    const categoriesData = await categoriesResponse.json();
+    const [linksData, categoriesData] = await Promise.all([
+      linksResponse.json(),
+      categoriesResponse.json(),
+    ]);
 
-    // Combine data for easier searching
+    // Process data and extract impact information
     allData = {};
-    for (const [website, categoryKey] of Object.entries(linksData)) {
-      if (categoriesData[categoryKey]) {
-        allData[website] = {
-          category: categoryKey,
-          ...categoriesData[categoryKey],
-        };
+    let processedCount = 0;
+    let impactStats = { high: 0, medium: 0, low: 0, unknown: 0 };
+
+    for (const [website, linkData] of Object.entries(linksData)) {
+      processedCount++;
+
+      // Get category key
+      const categoryKey = linkData.categories || linkData.category || "unknown";
+
+      // Get category info
+      const categoryInfo = categoriesData[categoryKey] || {};
+
+      // Extract impact - this is the key fix!
+      let impact = "unknown";
+      if (categoryInfo.impact) {
+        impact = categoryInfo.impact.toLowerCase();
+        // Validate impact value
+        if (!["high", "medium", "low"].includes(impact)) {
+          impact = "unknown";
+        }
       }
+
+      // Update stats
+      impactStats[impact]++;
+
+      // Create the data structure with correct impact
+      allData[website] = {
+        category: categoryKey,
+        icon: linkData.icon || "default",
+        impact: impact, // ← Now using the actual impact value!
+        description:
+          linkData.description ||
+          categoryInfo.description ||
+          `${formatCategoryName(categoryKey)} website`,
+        // Optional: include additional category data
+        categoryData: categoryInfo,
+      };
     }
+
+    // Log statistics
+    console.log("✅ Data processing complete!");
+    console.log("📊 Impact distribution:", impactStats);
+    console.log("🌐 Total websites processed:", processedCount);
 
     // Cache the processed data
     setCachedData(allData);
-
     console.log(
       "Data loaded successfully:",
       Object.keys(allData).length,
@@ -115,13 +168,51 @@ async function loadData() {
     );
   } catch (error) {
     console.error("Error loading data:", error);
+    showErrorMessage(`Failed to load data: ${error.message}`);
   }
+}
+
+// Show error message to user
+function showErrorMessage(message) {
+  const container = document.getElementById("resultsContainer");
+  const grid = document.getElementById("resultsGrid");
+  const noResults = document.getElementById("noResults");
+  const popularSearches = document.getElementById("popularSearches");
+
+  hideLoading();
+  container.classList.add("hidden");
+  popularSearches.classList.add("hidden");
+
+  // Show error in no results section
+  noResults.innerHTML = `
+    <div class="text-center py-12">
+      <div class="text-6xl mb-4">⚠️</div>
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">Error Loading Data</h3>
+      <p class="text-gray-600 mb-4">${message}</p>
+      <button onclick="location.reload()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        Reload Page
+      </button>
+    </div>
+  `;
+  noResults.classList.remove("hidden");
 }
 
 // Perform search
 function performSearch(query) {
+  console.log("Performing search for:", query);
+  console.log("Total data available:", Object.keys(allData).length);
+
   if (!query.trim()) {
     showPopularSearches();
+    return;
+  }
+
+  // Check if data is loaded
+  if (Object.keys(allData).length === 0) {
+    console.warn("No data available for search");
+    showErrorMessage(
+      "No data loaded. Please check your internet connection and reload the page."
+    );
     return;
   }
 
@@ -130,32 +221,53 @@ function performSearch(query) {
   // Simulate slight delay for better UX
   setTimeout(() => {
     const results = searchData(query.toLowerCase());
+    console.log("Search results:", results.length, "found");
     displayResults(results, query);
   }, 500);
 }
 
 // Search through the data
 function searchData(query) {
+  console.log("Searching for:", query);
   const results = [];
 
   for (const [website, data] of Object.entries(allData)) {
     let score = 0;
 
+    // Debug: log what we're checking
+    console.log(`Checking ${website}:`, {
+      category: data.category,
+      description: data.description,
+      icon: data.icon,
+    });
+
     // Exact match gets highest score
     if (website.toLowerCase() === query) {
       score += 100;
+      console.log(`Exact match found: ${website}`);
     }
     // Website name contains query
     else if (website.toLowerCase().includes(query)) {
       score += 50;
+      console.log(`Partial match found: ${website}`);
     }
     // Category name contains query
-    else if (data.category.toLowerCase().includes(query)) {
+    else if (data.category && data.category.toLowerCase().includes(query)) {
       score += 30;
+      console.log(`Category match found: ${website} (${data.category})`);
     }
-    // Description contains query
-    else if (data.description.toLowerCase().includes(query)) {
+    // Description contains query (if available)
+    else if (
+      data.description &&
+      data.description.toLowerCase().includes(query)
+    ) {
       score += 20;
+      console.log(`Description match found: ${website}`);
+    }
+    // Icon name contains query
+    else if (data.icon && data.icon.toLowerCase().includes(query)) {
+      score += 15;
+      console.log(`Icon match found: ${website} (${data.icon})`);
     }
 
     if (score > 0) {
@@ -167,6 +279,7 @@ function searchData(query) {
     }
   }
 
+  console.log("Search completed. Results:", results.length);
   // Sort by score (relevance)
   return results.sort((a, b) => b.score - a.score);
 }
@@ -238,7 +351,7 @@ function createResultCard(result) {
   });
 
   card.innerHTML = `
-          <div class="flex items-center space-x-4 mb-4">
+          <div class="flex items-start space-x-4 mb-4">
             <div class="flex-1">
               <h3 class="text-xl font-semibold text-gray-900 mb-1">${
                 result.website
@@ -252,11 +365,6 @@ function createResultCard(result) {
           <div class="mb-4">
             ${getImpactBadge(result.impact)}
           </div>
-          
-          <p class="text-gray-700 text-sm mb-4 line-clamp-3">${
-            result.description
-          }</p>
-          
        <div class="mt-auto flex justify-between items-center pt-4 border-t border-gray-100">
     <span class="text-sm text-gray-500">Click for details</span>
     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,6 +399,17 @@ function showPopularSearches() {
 
 // Display all links by default
 function displayAllLinks() {
+  console.log(
+    "Displaying all links. Data available:",
+    Object.keys(allData).length
+  );
+
+  if (Object.keys(allData).length === 0) {
+    console.warn("No data to display");
+    showErrorMessage("No websites loaded. Please check your data source.");
+    return;
+  }
+
   const allResults = Object.entries(allData).map(([website, data]) => ({
     website,
     score: 0, // Default score for sorting
@@ -300,6 +419,7 @@ function displayAllLinks() {
   // Sort alphabetically by default
   allResults.sort((a, b) => a.website.localeCompare(b.website));
 
+  console.log("Displaying", allResults.length, "websites");
   displayResults(allResults, "");
 }
 
@@ -365,6 +485,9 @@ function sortResults(sortBy) {
     case "alphabetical":
       sortedResults.sort((a, b) => a.website.localeCompare(b.website));
       break;
+    case "category":
+      sortedResults.sort((a, b) => a.category.localeCompare(b.category));
+      break;
     default: // relevance
       sortedResults.sort((a, b) => b.score - a.score);
   }
@@ -380,6 +503,14 @@ function sortResults(sortBy) {
 
 // Event listeners
 document.addEventListener("DOMContentLoaded", async () => {
+  // Clear cache button for debugging (you can remove this later)
+  console.log("Adding debug clear cache function to window");
+  window.clearCache = function () {
+    localStorage.removeItem(CACHE_KEY);
+    console.log("Cache cleared! Reloading...");
+    location.reload();
+  };
+
   await loadData();
 
   const searchInput = document.getElementById("searchInput");
@@ -417,9 +548,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   // Sort functionality
-  sortSelect.addEventListener("change", (e) => {
-    sortResults(e.target.value);
-  });
+  if (sortSelect) {
+    sortSelect.addEventListener("change", (e) => {
+      sortResults(e.target.value);
+    });
+  }
 
   // Popular search buttons
   document.addEventListener("click", (e) => {
@@ -433,8 +566,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   // Show popular searches initially if no data
   if (Object.keys(allData).length === 0) {
     showPopularSearches();
+  } else {
+    // Initialize by showing all links
+    displayAllLinks();
   }
-
-  // Initialize by showing all links
-  displayAllLinks();
 });
