@@ -145,7 +145,6 @@ async function updateWebsiteDescriptionAsync(
 
   descriptionElement.textContent = fallbackDescription;
 
-  // Show loading indicator in a subtle way
   const loadingIndicator = document.createElement("div");
   loadingIndicator.id = "ai-loading-indicator";
   loadingIndicator.className = "flex items-center text-gray-400 text-sm mt-2";
@@ -227,7 +226,6 @@ function setCachedData(data) {
   }
 }
 
-// Get impact badge HTML
 function getImpactBadge(impact) {
   const badges = {
     high: '<span class="impact-badge inline-flex items-center px-4 py-2 rounded-full text-base font-medium bg-red-100 text-red-800">🔴 High Environmental Impact</span>',
@@ -240,7 +238,6 @@ function getImpactBadge(impact) {
   return badges[impact] || badges.unknown;
 }
 
-// Format category name for display
 function formatCategoryName(categoryKey) {
   return categoryKey
     .split("_")
@@ -596,15 +593,43 @@ function fallbackCopyToClipboard() {
 }
 
 function goBack() {
-  window.history.back();
+  // Try to go back if there's history
+  if (document.referrer.includes(window.location.hostname)) {
+    window.history.back();
+  } else {
+    // If no history or came from different domain, redirect to home
+    window.location.href = "/";
+  }
 }
 
 function cleanup() {
   resetAISession();
 }
 
+// Make functions globally available
+window.shareLink = shareLink;
+window.visitWebsite = visitWebsite;
+window.goBack = goBack;
+window.hideToast = hideToast;
+
 document.addEventListener("DOMContentLoaded", () => {
   loadData();
+
+  // Add event listeners for all buttons
+  const backButton = document.querySelector('[onclick="goBack()"]');
+  if (backButton) {
+    backButton.addEventListener("click", goBack);
+  }
+
+  const shareButton = document.querySelector('[onclick="shareLink()"]');
+  if (shareButton) {
+    shareButton.addEventListener("click", shareLink);
+  }
+
+  const visitButton = document.querySelector('[onclick="visitWebsite()"]');
+  if (visitButton) {
+    visitButton.addEventListener("click", visitWebsite);
+  }
 });
 
 window.addEventListener("beforeunload", cleanup);
